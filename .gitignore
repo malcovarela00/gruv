@@ -1,0 +1,9 @@
+db.sqlite3
+*.secrets
+__pycache__
+virtualenv
+__pycache__/
+*.pyc
+.pyc
+pycache/
+migrations/
