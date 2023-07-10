@@ -3,7 +3,7 @@
     "configurations": [
         
         {
-            "name": "Equipla 2.0",
+            "name": "Gruv",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/manage.py",
