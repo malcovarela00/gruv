@@ -15,6 +15,12 @@ AdminSite.site_header = 'Gruv'
 AdminSite.site_title = 'Gruv'
 
 
+@admin.register(Pais)
+class PaisAdmin(admin.ModelAdmin):
+    list_display = ('code_pais', 'nombre')
+    search_fields = ('code_pais', 'nombre')
+
+
 @admin.register(Cliente)
 class ClienteAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'apellido', 'email', 'direccion', 'telefono')
@@ -23,16 +29,10 @@ class ClienteAdmin(admin.ModelAdmin):
     readonly_fields = ('update',)
 
 
-@admin.register(Pais)
-class PaisAdmin(admin.ModelAdmin):
-    list_display = ('code_pais', 'nombre')
-    search_fields = ('code_pais', 'nombre')
-
-
 @admin.register(Viaje)
 class ViajeAdmin(admin.ModelAdmin):
-    list_display = ('cliente', 'descripcion', 'localizador', 'fecha_viaje', 'cantidad_de_dias', 'vendedor')
-    search_fields = ('cliente', 'descripcion', 'localizador')
+    list_display = ('cliente', 'producto', 'localizador', 'fecha_viaje', 'total_dias', 'vendedor')
+    search_fields = ('cliente', 'producto', 'localizador')
     list_filter = ('fecha_viaje', 'vendedor')
     readonly_fields = ('update',)
 
@@ -41,7 +41,7 @@ class ViajeAdmin(admin.ModelAdmin):
 @admin.register(Pago)
 class PagoAdmin(admin.ModelAdmin):
     list_display = ('cliente', 'estado', 'opcion_pago', 'update', 'monto', 'moneda')
-    list_filter = ('estado', 'opcion_pago', 'update', 'moneda')
+    list_filter = ('estado', 'opcion_pago', 'fecha_vencimiento', 'moneda', 'update')
     search_fields = ('cliente__nombre',)
     readonly_fields = ('update',)
 

@@ -1,12 +1,12 @@
 OPCIONES_DE_PAGO = [
-    ('wise', 'Wise'),
-    ('santander', 'Santander'),
+    ('wise', 'WISE'),
+    ('santander', 'SANTANDER'),
     ('usdt', 'USDT'),
 ]
 
 ESTADO = [
     ('pendiente', 'Pendiente'),
-    ('pagado', 'Pagado'),
+    ('confirmado', 'Confirmado'),
     ('cancelado', 'Cancelado'),
 ]
 
