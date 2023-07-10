@@ -1,5 +1,6 @@
 from django.db import models
 from .choices import OPCIONES_DE_PAGO, ESTADO, OPCIONES_DE_MODEDA
+from django.contrib.auth.models import User
 
 
 class Cliente(models.Model):
@@ -8,7 +9,7 @@ class Cliente(models.Model):
     telefono = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     direccion = models.CharField(max_length=200, blank=True, null=True)
-    pais = models.ForeignKey('Pais', on_delete=models.CASCADE)
+    pais = models.ForeignKey('Pais', on_delete=models.CASCADE, blank=True, null=True)
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -27,6 +28,19 @@ class Pais(models.Model):
 
     class Meta:
         ordering = ['nombre']
+
+
+class Viaje(models.Model):
+    cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE)
+    descripcion = models.CharField(max_length=200)
+    localizador = models.CharField(max_length=50)
+    fecha_viaje = models.DateField()
+    cantidad_de_dias = models.PositiveSmallIntegerField(blank=True, null=True)
+    vendedor = models.ForeignKey(User, on_delete=models.CASCADE)
+    update = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.descripcion
 
 
 class Pago(models.Model):

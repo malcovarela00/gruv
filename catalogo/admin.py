@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Cliente, Pais, Pago, Proveedor
+from .models import Cliente, Pais, Viaje, Pago, Proveedor
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
@@ -27,6 +27,15 @@ class ClienteAdmin(admin.ModelAdmin):
 class PaisAdmin(admin.ModelAdmin):
     list_display = ('code_pais', 'nombre')
     search_fields = ('code_pais', 'nombre')
+
+
+@admin.register(Viaje)
+class ViajeAdmin(admin.ModelAdmin):
+    list_display = ('cliente', 'descripcion', 'localizador', 'fecha_viaje', 'cantidad_de_dias', 'vendedor')
+    search_fields = ('cliente', 'descripcion', 'localizador')
+    list_filter = ('fecha_viaje', 'vendedor')
+    readonly_fields = ('update',)
+
 
 
 @admin.register(Pago)
