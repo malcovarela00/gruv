@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Cliente, Pais, Viaje, Pago, Proveedor
+from .models import Cliente, Pais, Viaje, Pago, Proveedor, ViajeProveedor
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
@@ -37,7 +37,6 @@ class ViajeAdmin(admin.ModelAdmin):
     readonly_fields = ('update',)
 
 
-
 @admin.register(Pago)
 class PagoAdmin(admin.ModelAdmin):
     list_display = ('cliente', 'estado', 'opcion_pago', 'update', 'monto', 'moneda')
@@ -51,4 +50,12 @@ class ProveedorAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'comision', 'pais', 'update')
     list_filter = ('pais', 'comision', 'update')
     search_fields = ('nombre',)
+    readonly_fields = ('update',)
+
+
+@admin.register(ViajeProveedor)
+class ViajeProveedorAdmin(admin.ModelAdmin):
+    list_display = ('viaje', 'proveedor')
+    list_filter = ('proveedor', 'update')
+    search_fields = ('viaje', 'proveedor')
     readonly_fields = ('update',)

@@ -63,6 +63,7 @@ class Pago(models.Model):
     class Meta:
         ordering = ['-update']
 
+
 class Proveedor(models.Model):
     nombre = models.CharField(max_length=100)
     comision = models.DecimalField(max_digits=4, decimal_places=2, default=1.00)
@@ -78,3 +79,16 @@ class Proveedor(models.Model):
     class Meta:
         verbose_name = 'Proveedor'
         verbose_name_plural = 'Proveedores'
+
+
+class ViajeProveedor(models.Model):
+    viaje = models.ForeignKey('Viaje', on_delete=models.CASCADE)
+    proveedor = models.ForeignKey('Proveedor', on_delete=models.CASCADE)
+    update = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f'{self.viaje} - {self.proveedor}'
+
+    class Meta:
+        verbose_name = 'Viaje-Proveedor'
+        verbose_name_plural = 'Viaje-Proveedores'

@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Estado de pago</th>
+                <th>Localizador</th>
+                <th>Producto</th>
+                <th>Fecha de viaje</th>
+                <th>Total de días</th>
+                <th>Nombre de cliente</th>
+                <th>Pax</th>
+                <th>País de proveedor</th>
+                <th>Nombre de proveedor</th>
+                <th>Monto de pago</th>
+                <th>Vendedor</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for dato in datos %}
+                <tr>
+                    <td>{{ dato.estado }}</td>
+                    <td>{{ dato.localizador }}</td>
+                    <td>{{ dato.producto }}</td>
+                    <td>{{ dato.fecha_viaje }}</td>
+                    <td>{{ dato.total_dias }}</td>
+                    <td>{{ dato.nombre_cliente }}</td>
+                    <td>{{ dato.pax }}</td>
+                    <td>{{ dato.pais_proveedor }}</td>
+                    <td>{{ dato.nombre_proveedor }}</td>
+                    <td>{{ dato.monto_pago }}</td>
+                    <td>{{ dato.vendedor }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
