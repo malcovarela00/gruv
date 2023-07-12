@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 whitenoise==6.5.0
-=======
->>>>>>> add/init
 Django==4.2.2
 asgiref==3.7.2
 beautifulsoup4==4.12.2
