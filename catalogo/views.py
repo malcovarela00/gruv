@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Pago, Viaje, Proveedor
+from .models import PagoCliente, Viaje, Proveedor
 from django.contrib.admin.views.decorators import staff_member_required
 
 
@@ -8,7 +8,7 @@ def home(request):
 
 @staff_member_required
 def tabla_pagos(request):
-    pagos = Pago.objects.select_related('cliente').all()
+    pagos = PagoCliente.objects.select_related('cliente').all()
     datos = []
     for pago in pagos:
         viaje = Viaje.objects.filter(cliente=pago.cliente).first()
@@ -25,7 +25,7 @@ def tabla_pagos(request):
                 'pais_proveedor': proveedor.pais.nombre if proveedor else '',
                 'nombre_proveedor': proveedor.nombre if proveedor else '',
                 'monto_pago': pago.monto,
-                'vendedor': viaje.vendedor.username
+                'vendedor': viaje.vendedor.nombre
             })
     return render(request, 'tabla_pagos.html', {'datos': datos})
 

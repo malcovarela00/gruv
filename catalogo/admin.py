@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Cliente, Pais, Viaje, Pago, Proveedor, ViajeProveedor
+from .models import Cliente, Pais, Vendedor, Viaje, PagoCliente, Proveedor, ViajeProveedor, PagoProveedor
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
@@ -21,6 +21,14 @@ class PaisAdmin(admin.ModelAdmin):
     search_fields = ('code_pais', 'nombre')
 
 
+@admin.register(Vendedor)
+class VendedorAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'apellido', 'email', 'telefono')
+    search_fields = ('nombre', 'apellido', 'email', 'telefono')
+    list_filter = ('pais', 'update')
+    readonly_fields = ('update',)
+
+
 @admin.register(Cliente)
 class ClienteAdmin(admin.ModelAdmin):
     list_display = ('nombre', 'apellido', 'email', 'direccion', 'telefono', 'dni')
@@ -37,9 +45,9 @@ class ViajeAdmin(admin.ModelAdmin):
     readonly_fields = ('update',)
 
 
-@admin.register(Pago)
-class PagoAdmin(admin.ModelAdmin):
-    list_display = ('cliente', 'estado', 'opcion_pago', 'update', 'monto', 'moneda')
+@admin.register(PagoCliente)
+class PagoClienteAdmin(admin.ModelAdmin):
+    list_display = ('cliente', 'estado', 'opcion_pago', 'update', 'monto', 'comision_vendedor', 'moneda')
     list_filter = ('estado', 'opcion_pago', 'fecha_vencimiento', 'moneda', 'update')
     search_fields = ('cliente__nombre',)
     readonly_fields = ('update',)
@@ -58,4 +66,12 @@ class ViajeProveedorAdmin(admin.ModelAdmin):
     list_display = ('viaje', 'proveedor')
     list_filter = ('proveedor', 'update')
     search_fields = ('viaje', 'proveedor')
+    readonly_fields = ('update',)
+
+
+@admin.register(PagoProveedor)
+class PagoProveedorAdmin(admin.ModelAdmin):
+    list_display = ('proveedor', 'estado', 'opcion_pago', 'update', 'monto', 'moneda')
+    list_filter = ('estado', 'opcion_pago', 'fecha_vencimiento', 'moneda', 'update')
+    search_fields = ('proveedor__nombre',)
     readonly_fields = ('update',)
