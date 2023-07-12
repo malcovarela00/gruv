@@ -19,7 +19,7 @@ def tabla_pagos(request):
                 'localizador': viaje.localizador,
                 'producto': viaje.producto,
                 'fecha_viaje': viaje.fecha_viaje,
-                'total_dias': viaje.total_dias,
+                'fecha_vuelta': viaje.fecha_vuelta,
                 'nombre_cliente': pago.cliente.nombre,
                 'pax': viaje.pax,
                 'pais_proveedor': proveedor.pais.nombre if proveedor else '',

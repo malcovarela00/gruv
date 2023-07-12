@@ -21,6 +21,7 @@ class Pais(models.Model):
 class Cliente(models.Model):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100, blank=True, null=True)
+    dni = models.CharField(max_length=20)
     telefono = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     direccion = models.CharField(max_length=200, blank=True, null=True)
@@ -39,8 +40,8 @@ class Viaje(models.Model):
     producto = models.CharField(max_length=200)
     localizador = models.CharField(max_length=50)
     pax = models.PositiveSmallIntegerField(blank=True, null=True)
-    fecha_viaje = models.DateField()
-    total_dias = models.PositiveSmallIntegerField(blank=True, null=True)
+    fecha_viaje = models.DateField(blank=True, null=True)
+    fecha_vuelta = models.DateField(blank=True, null=True)
     vendedor = models.ForeignKey(User, on_delete=models.CASCADE)
     update = models.DateTimeField(auto_now=True)
 

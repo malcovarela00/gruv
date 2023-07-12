@@ -23,7 +23,7 @@ class PaisAdmin(admin.ModelAdmin):
 
 @admin.register(Cliente)
 class ClienteAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'apellido', 'email', 'direccion', 'telefono')
+    list_display = ('nombre', 'apellido', 'email', 'direccion', 'telefono', 'dni')
     search_fields = ('nombre', 'apellido', 'email', 'telefono')
     list_filter = ('pais', 'update')
     readonly_fields = ('update',)
@@ -31,7 +31,7 @@ class ClienteAdmin(admin.ModelAdmin):
 
 @admin.register(Viaje)
 class ViajeAdmin(admin.ModelAdmin):
-    list_display = ('cliente', 'producto', 'localizador', 'fecha_viaje', 'total_dias', 'vendedor')
+    list_display = ('cliente', 'producto', 'localizador', 'fecha_viaje', 'fecha_vuelta', 'vendedor')
     search_fields = ('cliente', 'producto', 'localizador')
     list_filter = ('fecha_viaje', 'vendedor')
     readonly_fields = ('update',)
