@@ -47,9 +47,9 @@ class ViajeAdmin(admin.ModelAdmin):
 
 @admin.register(PagoCliente)
 class PagoClienteAdmin(admin.ModelAdmin):
-    list_display = ('cliente', 'estado', 'opcion_pago', 'update', 'monto', 'comision_vendedor', 'moneda')
+    list_display = ('cliente', 'estado', 'opcion_pago', 'viaje', 'monto', 'comision_vendedor', 'moneda')
     list_filter = ('estado', 'opcion_pago', 'fecha_vencimiento', 'moneda', 'update')
-    search_fields = ('cliente__nombre',)
+    search_fields = ('cliente__nombre', 'viaje')
     readonly_fields = ('update',)
 
 

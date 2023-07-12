@@ -72,6 +72,7 @@ class Viaje(models.Model):
 
 class PagoCliente(models.Model):
     cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE)
+    viaje = models.ForeignKey('Viaje', on_delete=models.CASCADE)
     estado = models.CharField(max_length=10, choices=ESTADO)
     opcion_pago = models.CharField(max_length=10, choices=OPCIONES_DE_PAGO)
     monto = models.DecimalField(max_digits=7, decimal_places=2, default=0.00)
