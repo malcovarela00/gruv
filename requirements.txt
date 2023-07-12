@@ -1,5 +1,5 @@
 <<<<<<< HEAD
-whitenoise
+whitenoise==6.5.0
 =======
 >>>>>>> add/init
 Django==4.2.2
