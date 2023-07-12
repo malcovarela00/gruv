@@ -17,6 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from catalogo.views import home, tabla_pagos
+
+
 urlpatterns = [
+    path('', home, name='home'),
     path('admin/', admin.site.urls),
+    path('tabla_pagos/', tabla_pagos, name='tabla_pagos'),
 ]

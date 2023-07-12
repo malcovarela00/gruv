@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="jumbotron">
+        <h1 class="display-4">Gruv</h1>
+        <p class="lead">Bienvenido a Gruv, sitio de administración.</p>
+        <hr class="my-4">
+        <p>Más información en https://gruvtravel.es/.</p>
+        <a class="btn btn-primary btn-lg" href="{% url 'admin:index' %}" role="button">Administration</a>
+        <a class="btn btn-primary btn-lg" href="{% url 'tabla_pagos' %}" role="button">Tabla de Pagos</a>
+    </div>
+{% endblock %}
