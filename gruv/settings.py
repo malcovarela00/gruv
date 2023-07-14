@@ -90,7 +90,7 @@ DATABASES = {
         'NAME': 'gruv_psql',
         'USER': 'postgres',
         'PASSWORD': 'malco',
-        'HOST': 'localhost',
+        'HOST': '20.119.16.40',
         'PORT': '5432',
     }
 }
