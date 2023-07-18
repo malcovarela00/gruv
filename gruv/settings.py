@@ -89,10 +89,10 @@ WSGI_APPLICATION = 'gruv.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'gruv_psql',
-        'USER': 'postgres',
-        'PASSWORD': 'malco',
-        'HOST': '20.119.16.40',
+        'NAME': 'gruv-psql',
+        'USER': 'postgres@gruv-psql',
+        'PASSWORD': '9@2LrgqiL',
+        'HOST': 'gruv-psql.postgres.database.azure.com',
         'PORT': '5432',
     }
 }
