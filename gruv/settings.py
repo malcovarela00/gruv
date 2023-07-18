@@ -34,7 +34,7 @@ ALLOWED_HOSTS = [os.environ['WEBSITE_HOSTNAME']] if 'WEBSITE_HOSTNAME' in os.env
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',
+    #'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
