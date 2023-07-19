@@ -26,8 +26,8 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'gruv.settings'  # Reemplaza 'nombre_proy
 
 # Activa tu entorno virtual (si estás utilizando uno)
 # Si no estás utilizando un entorno virtual, puedes omitir esta parte
-venv_path = '/home/malcovarela90/.virtualenvs/entornoVirtual'  # Reemplaza 'usuario' y 'nombre_entorno' con tu información
-activate_this = os.path.join(venv_path, 'bin/activate_this.py')
+venv_path = '/home/malcovarela90/entornoVirtual'  # Reemplaza 'usuario' y 'nombre_entorno' con tu información
+activate_this = os.path.join(venv_path, 'bin/activate')
 with open(activate_this) as f:
     exec(f.read(), {'__file__': activate_this})
 
