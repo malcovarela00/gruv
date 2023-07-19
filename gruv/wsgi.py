@@ -1,12 +1,3 @@
-"""
-WSGI config for gruv project.
-
-It exposes the WSGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
-"""
-
 import os
 import sys
 
@@ -26,10 +17,10 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'gruv.settings'  # Reemplaza 'nombre_proy
 
 # Activa tu entorno virtual (si estás utilizando uno)
 # Si no estás utilizando un entorno virtual, puedes omitir esta parte
-venv_path = '/home/malcovarela90/entornoVirtual'  # Reemplaza 'usuario' y 'nombre_entorno' con tu información
-activate_this = os.path.join(venv_path, 'bin/activate')
-with open(activate_this) as f:
-    exec(f.read(), {'__file__': activate_this})
+# venv_path = '/home/malcovarela90/entornoVirtual'  # Reemplaza 'usuario' y 'nombre_entorno' con tu información
+# activate_this = os.path.join(venv_path, 'bin/activate')
+# with open(activate_this) as f:
+#     exec(f.read(), {'__file__': activate_this})
 
 # Importa el framework o la aplicación que deseas ejecutar
 from django.core.wsgi import get_wsgi_application
