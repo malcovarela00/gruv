@@ -85,11 +85,11 @@ WSGI_APPLICATION = 'gruv.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'gruv',
+        'NAME': 'malcovarela90$default',
         'USER': 'malcovarela90',
         'PASSWORD': 'temporal2023',
         'HOST': 'malcovarela90.mysql.pythonanywhere-services.com',
-        'PORT': '3306',
+        'PORT': '',
     }
 }
 
