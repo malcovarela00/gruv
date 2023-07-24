@@ -1,7 +1,11 @@
 OPCIONES_DE_PAGO = [
     ('wise', 'WISE'),
     ('santander', 'SANTANDER'),
+    ('bbva', 'BBVA'),
     ('usdt', 'USDT'),
+    ('cta-cc €', 'Cuenta Corriente (CTA-CC €)'),
+    ('pago destino', 'Pago destino'),
+    ('cash', 'cash'),
 ]
 
 ESTADO = [

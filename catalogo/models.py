@@ -1,5 +1,7 @@
+from django.utils import timezone
 from django.db import models
 from django.core.validators import MinValueValidator
+from django.forms import ValidationError
 from .choices import OPCIONES_DE_PAGO, ESTADO, OPCIONES_DE_MODEDA
 
 
@@ -39,7 +41,7 @@ class Vendedor(models.Model):
 class Cliente(models.Model):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100, blank=True, null=True)
-    dni = models.CharField(max_length=20, unique=True)
+    dni = models.CharField(max_length=20, unique=True, verbose_name='DNI/Pasaporte/ID')
     telefono = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     direccion = models.CharField(max_length=200, blank=True, null=True)
@@ -48,10 +50,6 @@ class Cliente(models.Model):
 
     def __str__(self):
         return self.nombre
-
-    def dni_upper(self):
-        return self.dni.upper()
-    dni_upper.short_description = 'DNI'
 
     class Meta:
         ordering = ['nombre']
@@ -62,35 +60,46 @@ class Viaje(models.Model):
     producto = models.CharField(max_length=200)
     localizador = models.CharField(max_length=50, unique=True)
     pax = models.PositiveSmallIntegerField(blank=True, null=True)
-    fecha_viaje = models.DateField(blank=True, null=True)
-    fecha_vuelta = models.DateField(blank=True, null=True)
+    fecha_viaje = models.DateField()
+    fecha_vuelta = models.DateField()
     vendedor = models.ForeignKey('Vendedor', on_delete=models.CASCADE)
-    porcentaje_ganancia_vendedor = models.DecimalField(max_digits=5, decimal_places=2, validators=[MinValueValidator(0)])
+    comision_vendedor = models.DecimalField(max_digits=4, decimal_places=2, default=0.00, validators=[MinValueValidator(0)])
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.producto
 
+    def clean(self):
+        super(Viaje, self).clean()
+
+        if self.fecha_vuelta < self.fecha_viaje:
+            raise ValidationError("La Fecha de Vuelta: debe ser posterior a la Fecha de Viaje.")
+
 
 class PagoCliente(models.Model):
-    viaje = models.ForeignKey('Viaje', on_delete=models.CASCADE)
+    viaje = models.OneToOneField('Viaje', on_delete=models.CASCADE)
     estado = models.CharField(max_length=10, choices=ESTADO)
-    opcion_pago = models.CharField(max_length=10, choices=OPCIONES_DE_PAGO)
+    opcion_pago = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
     monto = models.DecimalField(max_digits=7, decimal_places=2, default=0.00)
-    comision_vendedor = models.DecimalField(max_digits=4, decimal_places=2, default=0.00)
-    moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA, editable=False)
+    moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA)
     fecha_vencimiento = models.DateField()
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return str(self.cliente.nombre) + ' (' + self.estado + ')'
+        return str(self.viaje) + ' (' + self.estado + ')'
 
     def save(self, *args, **kwargs):
-        if self.opcion_pago == 'santander':
-            self.moneda = 'euro'
-        else:
+        if self.opcion_pago == 'usdt':
             self.moneda = 'dolar'
+        else:
+            self.moneda = 'euro'
         super().save(*args, **kwargs)
+
+    def clean(self):
+        super(PagoCliente, self).clean()
+
+        if self.fecha_vencimiento < timezone.localdate():
+            raise ValidationError("La Fecha de Vencimiento: debe ser posterior a la fecha de hoy.")
 
     class Meta:
         ordering = ['-update']
@@ -117,12 +126,12 @@ class Proveedor(models.Model):
 
 class PagoProveedor(models.Model):
     proveedor = models.ForeignKey('Proveedor', on_delete=models.CASCADE)
-    viaje = models.ForeignKey('Viaje', on_delete=models.CASCADE)
+    viaje = models.OneToOneField('Viaje', on_delete=models.CASCADE)
     estado = models.CharField(max_length=10, choices=ESTADO)
-    opcion_pago = models.CharField(max_length=10, choices=OPCIONES_DE_PAGO)
+    opcion_pago = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
     monto = models.DecimalField(max_digits=7, decimal_places=2, default=0.00)
-    moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA, editable=False)
-    fecha_vencimiento = models.DateField()
+    moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA)
+    fecha_vencimiento = models.DateField(verbose_name='Fecha de Entrada en Gastos')
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -134,6 +143,12 @@ class PagoProveedor(models.Model):
         else:
             self.moneda = 'dolar'
         super().save(*args, **kwargs)
+
+    def clean(self):
+        super(PagoProveedor, self).clean()
+
+        if self.fecha_vencimiento < timezone.localdate():
+            raise ValidationError("La Fecha de Entrada en Gastos: debe ser posterior a la fecha de hoy.")
 
     class Meta:
         ordering = ['-update']
