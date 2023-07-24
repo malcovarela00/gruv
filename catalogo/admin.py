@@ -3,6 +3,8 @@ from .models import Cliente, Pais, Vendedor, Viaje, PagoCliente, Proveedor, Pago
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
+from django.utils.safestring import mark_safe
+
 
 
 class MyUserAdmin(UserAdmin):
@@ -48,18 +50,31 @@ class ClienteAdmin(admin.ModelAdmin):
 @admin.register(Viaje)
 class ViajeAdmin(admin.ModelAdmin):
     inlines = [PagoClienteInline, PagoProveedorInline]
-    list_display = ('cliente', 'producto', 'localizador', 'fecha_viaje', 'fecha_vuelta', 'vendedor', 'porcentaje_ganancia_vendedor')
+    list_display = ('cliente', 'producto', 'localizador', 'fecha_viaje', 'fecha_vuelta', 'vendedor', 'comision_vendedor')
     search_fields = ('cliente', 'producto', 'localizador')
     list_filter = ('fecha_viaje', 'vendedor', )
     readonly_fields = ('update', )
 
 
-@admin.register(PagoCliente)
 class PagoClienteAdmin(admin.ModelAdmin):
-    list_display = ('estado', 'opcion_pago', 'viaje', 'monto', 'comision_vendedor', 'moneda')
+    list_display = ('viaje', 'estado_coloreado', 'opcion_pago', 'monto', 'moneda')
     list_filter = ('estado', 'opcion_pago', 'fecha_vencimiento', 'moneda', 'update')
     search_fields = ('viaje',)
     readonly_fields = ('update',)
+
+    def estado_coloreado(self, obj):
+        if obj.estado == 'confirmado':
+            color = 'green' 
+        elif obj.estado == 'pendiente':
+            color = 'orange'
+        else:
+            color = 'red'
+        return mark_safe(f'<span style="color:{color};">{obj.get_estado_display()}</span>')
+
+    # Nombre descriptivo para la columna en el admin
+    estado_coloreado.short_description = 'Estado'
+# Registramos la clase personalizada con el modelo PagoCliente
+admin.site.register(PagoCliente, PagoClienteAdmin)
 
 
 @admin.register(Proveedor)
