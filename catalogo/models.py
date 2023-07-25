@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.utils import timezone
 from django.db import models
 from django.core.validators import MinValueValidator
@@ -14,8 +15,6 @@ class Pais(models.Model):
 
     class Meta:
         ordering = ['nombre']
-
-    class Meta:
         verbose_name = 'Pais'
         verbose_name_plural = 'Paises'
 
@@ -63,7 +62,7 @@ class Viaje(models.Model):
     fecha_viaje = models.DateField()
     fecha_vuelta = models.DateField()
     vendedor = models.ForeignKey('Vendedor', on_delete=models.CASCADE)
-    comision_vendedor = models.DecimalField(max_digits=4, decimal_places=2, default=0.00, validators=[MinValueValidator(0)])
+    comision_vendedor = models.DecimalField(max_digits=4, decimal_places=2, default=0.00, validators=[MinValueValidator(0)], verbose_name='Comision Vendedor (%)')
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -80,7 +79,7 @@ class PagoCliente(models.Model):
     viaje = models.OneToOneField('Viaje', on_delete=models.CASCADE)
     estado = models.CharField(max_length=10, choices=ESTADO)
     opcion_pago = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
-    monto = models.DecimalField(max_digits=7, decimal_places=2, default=0.00)
+    monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA)
     fecha_vencimiento = models.DateField()
     update = models.DateTimeField(auto_now=True)
@@ -103,8 +102,8 @@ class PagoCliente(models.Model):
 
     class Meta:
         ordering = ['-update']
-        verbose_name = 'Pago-Cliente'
-        verbose_name_plural = 'Pagos-Clientes'
+        verbose_name = 'Pago Cliente'
+        verbose_name_plural = 'Pagos Clientes'
 
 
 class Proveedor(models.Model):
@@ -118,8 +117,6 @@ class Proveedor(models.Model):
 
     class Meta:
         ordering = ['nombre']
-
-    class Meta:
         verbose_name = 'Proveedor'
         verbose_name_plural = 'Proveedores'
 
@@ -129,7 +126,7 @@ class PagoProveedor(models.Model):
     viaje = models.OneToOneField('Viaje', on_delete=models.CASCADE)
     estado = models.CharField(max_length=10, choices=ESTADO)
     opcion_pago = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
-    monto = models.DecimalField(max_digits=7, decimal_places=2, default=0.00)
+    precio_proveedor = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA)
     fecha_vencimiento = models.DateField(verbose_name='Fecha de Entrada en Gastos')
     update = models.DateTimeField(auto_now=True)
@@ -152,5 +149,24 @@ class PagoProveedor(models.Model):
 
     class Meta:
         ordering = ['-update']
-        verbose_name = 'Pago-Proveedor'
-        verbose_name_plural = 'Pagos-Proveedores'
+        verbose_name = 'Pago Proveedor'
+        verbose_name_plural = 'Pagos Proveedores'
+
+
+class Saldo(models.Model):
+    viaje = models.OneToOneField('Viaje', on_delete=models.CASCADE)
+    pago_cliente_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    pago_cliente_estado = models.CharField(max_length=10, choices=ESTADO)
+    pago_cliente_opcion_pago = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
+    pago_cliente_moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA)
+    
+    pago_proveedor_estado = models.CharField(max_length=10, choices=ESTADO)
+    pago_proveedor_opcion_pago = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
+    pago_proveedor_precio = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    pago_proveedor_moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA)
+    
+    pago_proveedor = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
+    ganancia_bruto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
+
+    def __str__(self):
+        return f"Saldo para {self.viaje}"

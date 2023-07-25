@@ -87,7 +87,7 @@ class ProveedorAdmin(admin.ModelAdmin):
 
 @admin.register(PagoProveedor)
 class PagoProveedorAdmin(admin.ModelAdmin):
-    list_display = ('proveedor', 'estado', 'opcion_pago', 'update', 'monto', 'moneda')
+    list_display = ('proveedor', 'estado', 'opcion_pago', 'precio_proveedor', 'moneda', 'update')
     list_filter = ('estado', 'opcion_pago', 'fecha_vencimiento', 'moneda', 'update')
     search_fields = ('proveedor__nombre',)
     readonly_fields = ('update',)
