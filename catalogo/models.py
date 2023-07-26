@@ -43,7 +43,6 @@ class Cliente(models.Model):
     dni = models.CharField(max_length=20, unique=True, verbose_name='DNI/Pasaporte/ID')
     telefono = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
-    direccion = models.CharField(max_length=200, blank=True, null=True)
     pais = models.ForeignKey('Pais', on_delete=models.CASCADE, blank=True, null=True)
     update = models.DateTimeField(auto_now=True)
 

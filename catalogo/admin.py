@@ -41,7 +41,7 @@ class VendedorAdmin(admin.ModelAdmin):
 
 @admin.register(Cliente)
 class ClienteAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'apellido', 'email', 'direccion', 'telefono', 'dni')
+    list_display = ('nombre', 'apellido', 'email', 'telefono', 'dni')
     search_fields = ('nombre', 'apellido', 'email', 'telefono')
     list_filter = ('pais', 'update')
     readonly_fields = ('update',)

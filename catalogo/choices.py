@@ -6,6 +6,7 @@ OPCIONES_DE_PAGO = [
     ('cta-cc €', 'Cuenta Corriente (CTA-CC €)'),
     ('pago destino', 'Pago destino'),
     ('cash', 'cash'),
+    ('pendiente', 'Pendiente'),
 ]
 
 ESTADO = [
