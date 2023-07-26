@@ -17,11 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from catalogo.views import home, tabla_pagos
+from catalogo.views import home, viaje_list
 
 
 urlpatterns = [
     path('', home, name='home'),
     path('admin/', admin.site.urls),
-    path('tabla_pagos/', tabla_pagos, name='tabla_pagos'),
+    path('viaje-list/', viaje_list, name='viaje_list'),
 ]

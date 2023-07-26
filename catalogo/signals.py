@@ -29,3 +29,46 @@ def create_or_update_saldo(sender, instance, created, **kwargs):
     saldo.ganancia_bruto = pago_cliente.monto - saldo.pago_proveedor
 
     saldo.save()
+
+@receiver(post_save, sender=PagoCliente)
+def update_saldo_on_pagocliente_save(sender, instance, created, **kwargs):
+    if created:
+        # PagoCliente instance is created, update related Saldo
+        saldo, _ = Saldo.objects.get_or_create(viaje=instance.viaje)
+    else:
+        # PagoCliente instance is updated, update related Saldo
+        saldo = Saldo.objects.get(viaje=instance.viaje)
+
+    # Update fields in Saldo based on PagoCliente
+    saldo.pago_cliente_estado = instance.estado
+    saldo.pago_cliente_opcion_pago = instance.opcion_pago
+    saldo.pago_cliente_monto = instance.monto
+    saldo.pago_cliente_moneda = instance.moneda
+
+    # Update the calculated fields in Saldo
+    saldo.pago_proveedor = saldo.pago_proveedor_precio - (saldo.pago_proveedor_precio * (instance.viaje.pagoproveedor.proveedor.comision / 100))
+    saldo.ganancia_bruto = instance.monto - saldo.pago_proveedor
+
+    saldo.save()
+
+
+@receiver(post_save, sender=PagoProveedor)
+def update_saldo_on_pagoproveedor_save(sender, instance, created, **kwargs):
+    if created:
+        # PagoProveedor instance is created, update related Saldo
+        saldo, _ = Saldo.objects.get_or_create(viaje=instance.viaje)
+    else:
+        # PagoProveedor instance is updated, update related Saldo
+        saldo = Saldo.objects.get(viaje=instance.viaje)
+
+    # Update fields in Saldo based on PagoProveedor
+    saldo.pago_proveedor_estado = instance.estado
+    saldo.pago_proveedor_opcion_pago = instance.opcion_pago
+    saldo.pago_proveedor_precio = instance.precio_proveedor
+    saldo.pago_proveedor_moneda = instance.moneda
+
+    # Update the calculated fields in Saldo
+    saldo.pago_proveedor = instance.precio_proveedor - (instance.precio_proveedor * (instance.proveedor.comision / 100))
+    saldo.ganancia_bruto = saldo.pago_cliente_monto - instance.precio_proveedor
+
+    saldo.save()
