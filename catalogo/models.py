@@ -71,8 +71,9 @@ class Viaje(models.Model):
     def clean(self):
         super(Viaje, self).clean()
 
-        if self.fecha_vuelta < self.fecha_viaje:
-            raise ValidationError("La Fecha de Vuelta: debe ser posterior a la Fecha de Viaje.")
+        if self.fecha_vuelta is not None and self.fecha_viaje is not None:
+            if self.fecha_vuelta < self.fecha_viaje:
+                raise ValidationError("La Fecha de Vuelta debe ser posterior a la Fecha de Viaje.")
 
 
 class PagoCliente(models.Model):
