@@ -64,6 +64,9 @@
                         <th>Pago Proveedor Moneda</th>
                         <th>Pago Proveedor</th>
                         <th>Ganancia Bruto</th>
+                        <th>Ganancia USD Vendedor</th>
+                        <th>Ganancia GRUV</th>
+                        <th>Ganancia Neta (%)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -87,6 +90,9 @@
                         <td>{{ viaje.saldo.pago_proveedor_moneda }}</td>
                         <td>{{ viaje.saldo.pago_proveedor }}</td>
                         <td>{{ viaje.saldo.ganancia_bruto }}</td>
+                        <td>{{ viaje.saldo.ganancia_usd_vendedor }}</td>
+                        <td>{{ viaje.saldo.ganancia_gruv }}</td>
+                        <td>{{ viaje.saldo.ganancia_neta_porc }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

@@ -24,9 +24,13 @@ def create_or_update_saldo(sender, instance, created, **kwargs):
     saldo.pago_proveedor_opcion_pago = pago_proveedor.opcion_pago
     saldo.pago_proveedor_precio = pago_proveedor.precio_proveedor
     saldo.pago_proveedor_moneda = pago_proveedor.moneda
-
     saldo.pago_proveedor = saldo.pago_proveedor_precio - (saldo.pago_proveedor_precio * (pago_proveedor.proveedor.comision / 100))
+
     saldo.ganancia_bruto = pago_cliente.monto - saldo.pago_proveedor
+    saldo.ganancia_usd_vendedor = pago_cliente.monto * (instance.comision_vendedor / 100)
+    saldo.ganancia_gruv = saldo.ganancia_bruto - saldo.ganancia_usd_vendedor
+    saldo.ganancia_neta_porc = (saldo.ganancia_gruv * 100) / saldo.ganancia_bruto if saldo.ganancia_bruto != 0 else 0
+    
 
     saldo.save()
 
@@ -44,10 +48,12 @@ def update_saldo_on_pagocliente_save(sender, instance, created, **kwargs):
     saldo.pago_cliente_opcion_pago = instance.opcion_pago
     saldo.pago_cliente_monto = instance.monto
     saldo.pago_cliente_moneda = instance.moneda
-
-    # Update the calculated fields in Saldo
     saldo.pago_proveedor = saldo.pago_proveedor_precio - (saldo.pago_proveedor_precio * (instance.viaje.pagoproveedor.proveedor.comision / 100))
+    
     saldo.ganancia_bruto = instance.monto - saldo.pago_proveedor
+    saldo.ganancia_usd_vendedor = instance.monto * (instance.viaje.comision_vendedor / 100)
+    saldo.ganancia_gruv = saldo.ganancia_bruto - saldo.ganancia_usd_vendedor
+    saldo.ganancia_neta_porc = (saldo.ganancia_gruv * 100) / saldo.ganancia_bruto if saldo.ganancia_bruto != 0 else 0
 
     saldo.save()
 
@@ -66,9 +72,11 @@ def update_saldo_on_pagoproveedor_save(sender, instance, created, **kwargs):
     saldo.pago_proveedor_opcion_pago = instance.opcion_pago
     saldo.pago_proveedor_precio = instance.precio_proveedor
     saldo.pago_proveedor_moneda = instance.moneda
-
-    # Update the calculated fields in Saldo
     saldo.pago_proveedor = instance.precio_proveedor - (instance.precio_proveedor * (instance.proveedor.comision / 100))
+    
     saldo.ganancia_bruto = saldo.pago_cliente_monto - instance.precio_proveedor
+    saldo.ganancia_usd_vendedor = instance.viaje.pagocliente.monto * (instance.viaje.comision_vendedor / 100)
+    saldo.ganancia_gruv = saldo.ganancia_bruto - saldo.ganancia_usd_vendedor
+    saldo.ganancia_neta_porc = (saldo.ganancia_gruv * 100) / saldo.ganancia_bruto if saldo.ganancia_bruto != 0 else 0
 
     saldo.save()
