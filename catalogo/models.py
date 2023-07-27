@@ -155,6 +155,7 @@ class PagoProveedor(models.Model):
 
 class Saldo(models.Model):
     viaje = models.OneToOneField('Viaje', on_delete=models.CASCADE)
+    
     pago_cliente_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     pago_cliente_estado = models.CharField(max_length=10, choices=ESTADO)
     pago_cliente_opcion_pago = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
@@ -164,9 +165,12 @@ class Saldo(models.Model):
     pago_proveedor_opcion_pago = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
     pago_proveedor_precio = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     pago_proveedor_moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA)
-    
     pago_proveedor = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
+    
     ganancia_bruto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
+    ganancia_usd_vendedor = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
+    ganancia_gruv = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
+    ganancia_neta_porc = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
 
     def __str__(self):
         return f"Saldo para {self.viaje}"
