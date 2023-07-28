@@ -4,8 +4,9 @@ OPCIONES_DE_PAGO = [
     ('bbva', 'BBVA'),
     ('usdt', 'USDT'),
     ('cta-cc €', 'Cuenta Corriente (CTA-CC €)'),
+    ('cta-cc usd', 'Cuenta Corriente (CTA-CC USD)'),
     ('pago destino', 'Pago destino'),
-    ('cash', 'cash'),
+    ('cash', 'Cash'),
     ('pendiente', 'Pendiente'),
 ]
 
