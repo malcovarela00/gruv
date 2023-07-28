@@ -1,114 +1,70 @@
+{% extends 'base.html' %}
+
 {% block content %}
+    <h1>Lista de Viajes</h1>
+    <table id="myTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Producto</th>
+                <th>Localizador</th>
+                <th>PAX</th>
+                <th>Fecha Viaje</th>
+                <th>Fecha Vuelta</th>
+                <th>Vendedor</th>
+                <th>Comision Vendedor (%)</th>
+                <th>Pago Cliente Monto</th>
+                <th>Pago Cliente Estado</th>
+                <th>Pago Cliente Opcion Pago</th>
+                <th>Pago Cliente Moneda</th>
+                <th>Pago Proveedor Estado</th>
+                <th>Pago Proveedor Opcion Pago</th>
+                <th>Pago Proveedor Precio</th>
+                <th>Pago Proveedor Moneda</th>
+                <th>Pago Proveedor</th>
+                <th>Ganancia Bruto</th>
+                <th>Ganancia USD Vendedor</th>
+                <th>Ganancia GRUV</th>
+                <th>Ganancia Neta (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for viaje in viajes %}
+            <tr>
+                <td>{{ viaje.cliente }}</td>
+                <td>{{ viaje.producto }}</td>
+                <td>{{ viaje.localizador }}</td>
+                <td>{{ viaje.pax }}</td>
+                <td>{{ viaje.fecha_viaje }}</td>
+                <td>{{ viaje.fecha_vuelta }}</td>
+                <td>{{ viaje.vendedor }}</td>
+                <td>{{ viaje.comision_vendedor }}</td>
+                <td>{{ viaje.saldo.pago_cliente_monto }}</td>
+                <td data-estado="{{ viaje.saldo.pago_cliente_estado }}">{{ viaje.saldo.pago_cliente_estado }}</td>
+                <td>{{ viaje.saldo.pago_cliente_opcion_pago }}</td>
+                <td>{{ viaje.saldo.pago_cliente_moneda }}</td>
+                <td data-estado="{{ viaje.saldo.pago_proveedor_estado }}">{{ viaje.saldo.pago_proveedor_estado }}</td>
+                <td>{{ viaje.saldo.pago_proveedor_opcion_pago }}</td>
+                <td>{{ viaje.saldo.pago_proveedor_precio }}</td>
+                <td>{{ viaje.saldo.pago_proveedor_moneda }}</td>
+                <td>{{ viaje.saldo.pago_proveedor }}</td>
+                <td>{{ viaje.saldo.ganancia_bruto }}</td>
+                <td>{{ viaje.saldo.ganancia_usd_vendedor }}</td>
+                <td>{{ viaje.saldo.ganancia_gruv }}</td>
+                <td>{{ viaje.saldo.ganancia_neta_porc }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Lista de Viajes</title>
-        <link rel="stylesheet" href="https://cdn.datatables.net/1.13.5/css/jquery.dataTables.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.6.0/css/bootstrap.min.css">
-        <style>
-            /* Color de letra rojo para estado "pendiente" */
-            td[data-estado="pendiente"] {
-                color: red;
-            }
-        
-            /* Color de letra verde para estado "confirmado" */
-            td[data-estado="confirmado"] {
-                color: green;
-            }
-        
-            /* Agregar bordes a la tabla y separar las columnas */
-            table {
-                border-collapse: collapse;
-                width: 100%;
-            }
-        
-            th, td {
-                border: 1px solid black;
-                padding: 8px;
-                text-align: left;
-            }
-        
-            th {
-                border-bottom: 0.1px solid black;
-            }
-        
-            tr:nth-child(even) {
-                background-color: #f2f2f2;
-            }
-        </style>
-
-    </head>
-    
-    <body>
-        <div class="container-fluid">
-            <h1>Lista de Viajes</h1>
-            <table id="myTable" class="table table-striped">
-                <thead>
-                    <tr>
-                        <th>Cliente</th>
-                        <th>Producto</th>
-                        <th>Localizador</th>
-                        <th>PAX</th>
-                        <th>Fecha Viaje</th>
-                        <th>Fecha Vuelta</th>
-                        <th>Vendedor</th>
-                        <th>Comision Vendedor (%)</th>
-                        <th>Pago Cliente Monto</th>
-                        <th>Pago Cliente Estado</th>
-                        <th>Pago Cliente Opcion Pago</th>
-                        <th>Pago Cliente Moneda</th>
-                        <th>Pago Proveedor Estado</th>
-                        <th>Pago Proveedor Opcion Pago</th>
-                        <th>Pago Proveedor Precio</th>
-                        <th>Pago Proveedor Moneda</th>
-                        <th>Pago Proveedor</th>
-                        <th>Ganancia Bruto</th>
-                        <th>Ganancia USD Vendedor</th>
-                        <th>Ganancia GRUV</th>
-                        <th>Ganancia Neta (%)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for viaje in viajes %}
-                    <tr>
-                        <td>{{ viaje.cliente }}</td>
-                        <td>{{ viaje.producto }}</td>
-                        <td>{{ viaje.localizador }}</td>
-                        <td>{{ viaje.pax }}</td>
-                        <td>{{ viaje.fecha_viaje }}</td>
-                        <td>{{ viaje.fecha_vuelta }}</td>
-                        <td>{{ viaje.vendedor }}</td>
-                        <td>{{ viaje.comision_vendedor }}</td>
-                        <td>{{ viaje.saldo.pago_cliente_monto }}</td>
-                        <td data-estado="{{ viaje.saldo.pago_cliente_estado }}">{{ viaje.saldo.pago_cliente_estado }}</td>
-                        <td>{{ viaje.saldo.pago_cliente_opcion_pago }}</td>
-                        <td>{{ viaje.saldo.pago_cliente_moneda }}</td>
-                        <td data-estado="{{ viaje.saldo.pago_proveedor_estado }}">{{ viaje.saldo.pago_proveedor_estado }}</td>
-                        <td>{{ viaje.saldo.pago_proveedor_opcion_pago }}</td>
-                        <td>{{ viaje.saldo.pago_proveedor_precio }}</td>
-                        <td>{{ viaje.saldo.pago_proveedor_moneda }}</td>
-                        <td>{{ viaje.saldo.pago_proveedor }}</td>
-                        <td>{{ viaje.saldo.ganancia_bruto }}</td>
-                        <td>{{ viaje.saldo.ganancia_usd_vendedor }}</td>
-                        <td>{{ viaje.saldo.ganancia_gruv }}</td>
-                        <td>{{ viaje.saldo.ganancia_neta_porc }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
-        <script>
-            $(document).ready(function() {
-                $('#myTable').DataTable({
-                    autoWidth: true
-                });
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.5/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#myTable').DataTable({
+                autoWidth: true
             });
-        </script>
-    </body>
-</html>
-
+        });
+    </script>
 {% endblock %}
