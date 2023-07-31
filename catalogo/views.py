@@ -22,7 +22,7 @@ def saldo(request):
     entradas_por_pago_cliente = pagos_cliente.annotate(
         entrada=Case(
             *[When(opcion_pago=opcion, then=F('monto')) for opcion, _ in OPCIONES_DE_PAGO],
-            default=0, output_field=DecimalField()
+            default=0, output_field=DecimalField(max_digits=10, decimal_places=2)
         )
     ).values('opcion_pago').annotate(total_entrada=Sum('entrada'))
 
@@ -30,7 +30,7 @@ def saldo(request):
     salidas_por_pago_proveedor = pagos_proveedor.annotate(
         salida=Case(
             *[When(opcion_pago=opcion, then=F('precio_proveedor')) for opcion, _ in OPCIONES_DE_PAGO],
-            default=0, output_field=DecimalField()
+            default=0, output_field=DecimalField(max_digits=10, decimal_places=2)
         )
     ).values('opcion_pago').annotate(total_salida=Sum('salida'))
 
