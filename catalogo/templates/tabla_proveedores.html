@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+    <h1>Tabla de Pagos de Proveedores</h1>
+    <table id="pagoProvee" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>País</th>
+                <th>Saldo</th>
+                <th>Pendiente</th>
+                <th>Pago en Destino</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for proveedor_info in proveedores_info %}
+            <tr>
+                <td>{{ proveedor_info.pais__nombre }}</td>
+                <td>{{ proveedor_info.saldo }}</td>
+                <td>{{ proveedor_info.pendiente }}</td>
+                <td>{{ proveedor_info.pago_en_destino }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}
+

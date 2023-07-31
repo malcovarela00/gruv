@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from .models import Viaje, PagoCliente, PagoProveedor, OPCIONES_DE_PAGO
+from .models import Viaje, PagoCliente, Proveedor, PagoProveedor, OPCIONES_DE_PAGO
 from django.contrib.admin.views.decorators import staff_member_required
 
-from django.db.models import Sum, F, Case, When, DecimalField
+from django.db.models import Sum, F, Case, When, DecimalField, Value
 
 def home(request):
     return render(request, 'home.html')
@@ -13,7 +13,7 @@ def viaje_list(request):
     return render(request, 'viaje_list.html', {'viajes': viajes_with_saldo})
 
 @staff_member_required
-def saldo(request):
+def balance(request):
     # Obtener todos los pagos de clientes y proveedores
     pagos_cliente = PagoCliente.objects.all()
     pagos_proveedor = PagoProveedor.objects.all()
@@ -43,4 +43,28 @@ def saldo(request):
         saldo_por_pago.append((opcion, entrada, salida, saldo))
 
     # Renderizar la plantilla con la información calculada
-    return render(request, 'saldo.html', {'saldo_por_pago': saldo_por_pago})
+    return render(request, 'balance.html', {'saldo_por_pago': saldo_por_pago})
+
+@staff_member_required
+def pago_proveedor(request):
+    # Obtener la información requerida para la tabla
+    proveedores_info = Proveedor.objects.values('pais__nombre').annotate(
+        saldo=Sum('pagoproveedor__precio_proveedor'),
+        pendiente=Sum(
+            Case(
+                When(pagoproveedor__estado='pendiente', then=F('pagoproveedor__precio_proveedor')),
+                default=Value(0),
+                output_field=DecimalField()
+            )
+        ),
+        pago_en_destino=Sum(
+            Case(
+                When(pagoproveedor__opcion_pago='pago destino', then=F('pagoproveedor__precio_proveedor')),
+                default=Value(0),
+                output_field=DecimalField()
+            )
+        ),
+    )
+
+    return render(request, 'tabla_proveedores.html', {'proveedores_info': proveedores_info})
+
