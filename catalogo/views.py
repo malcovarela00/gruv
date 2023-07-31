@@ -50,7 +50,7 @@ def balance(request):
 def pago_proveedor(request):
     # Obtener la información requerida para la tabla
     proveedores_info = Proveedor.objects.values('pais__nombre').annotate(
-        saldo=Sum('pagoproveedor__precio_proveedor'),
+        saldo=Sum('pagoproveedor__precio_proveedor', default=0,),
         pendiente=Sum(
             Case(
                 When(pagoproveedor__estado='pendiente', then=F('pagoproveedor__precio_proveedor')),
