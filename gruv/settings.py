@@ -25,8 +25,10 @@ SECRET_KEY = 'django-insecure-=y1pd7*ih-qpx60vd5d3l9rk1y7rp6s3^^&m1(76##3-7ctx9b
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['malcovarela90.pythonanywhere.com']
+ALLOWED_HOSTS = ['admin.gruvtravel.es']  # Actualiza el dominio permitido
 
+# Agrega también el nuevo dominio o subdominio a ALLOWED_HOSTS para que Django acepte solicitudes desde este dominio
+ALLOWED_HOSTS += ['malcovarela90.pythonanywhere.com']
 
 # Application definition
 
