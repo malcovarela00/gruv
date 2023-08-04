@@ -51,7 +51,7 @@ class ClienteAdmin(admin.ModelAdmin):
 class ViajeAdmin(admin.ModelAdmin):
     inlines = [PagoClienteInline, PagoProveedorInline]
     list_display = ('cliente', 'producto', 'localizador', 'fecha_viaje', 'fecha_vuelta', 'vendedor', 'comision_vendedor')
-    search_fields = ('cliente', 'producto', 'localizador')
+    search_fields = ('cliente__nombre', 'producto', 'localizador')
     list_filter = ('fecha_viaje', 'vendedor', )
     readonly_fields = ('update', )
 
@@ -59,7 +59,7 @@ class ViajeAdmin(admin.ModelAdmin):
 class PagoClienteAdmin(admin.ModelAdmin):
     list_display = ('viaje', 'estado_coloreado', 'opcion_pago', 'monto', 'moneda')
     list_filter = ('estado', 'opcion_pago', 'fecha_vencimiento', 'moneda', 'update')
-    search_fields = ('viaje',)
+    search_fields = ('viaje__producto',)
     readonly_fields = ('update',)
 
     def estado_coloreado(self, obj):
