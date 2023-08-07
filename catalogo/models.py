@@ -62,6 +62,7 @@ class Viaje(models.Model):
     fecha_vuelta = models.DateField()
     vendedor = models.ForeignKey('Vendedor', on_delete=models.CASCADE)
     comision_vendedor = models.DecimalField(max_digits=4, decimal_places=2, default=0.00, validators=[MinValueValidator(0)], verbose_name='Comision Vendedor (%)')
+    fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):

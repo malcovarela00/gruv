@@ -5,6 +5,7 @@
     <table id="myTable" class="table table-striped">
         <thead>
             <tr>
+                <th>Fecha de Creación</th>
                 <th>Cliente</th>
                 <th>Producto</th>
                 <th>Localizador</th>
@@ -31,6 +32,7 @@
         <tbody>
             {% for viaje in viajes %}
             <tr>
+                <td>{{ viaje.fecha_creacion }}</td>
                 <td>{{ viaje.cliente }}</td>
                 <td>{{ viaje.producto }}</td>
                 <td>{{ viaje.localizador }}</td>
