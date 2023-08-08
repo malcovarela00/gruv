@@ -87,7 +87,7 @@ DATABASES = {
         'NAME': 'malcovarela90$gruv_sql',
         'USER': 'malcovarela90',
         'PASSWORD': 'rHBKPbxgDZC3',
-        'HOST': 'localhost',
+        'HOST': '127.0.0.1',
         'PORT': '3306',
     }
 }
