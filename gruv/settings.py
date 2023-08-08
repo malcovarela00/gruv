@@ -87,7 +87,7 @@ DATABASES = {
         'NAME': 'malcovarela90$gruv_sql',
         'USER': 'malcovarela90',
         'PASSWORD': 'rHBKPbxgDZC3',
-        'HOST': 'malcovarela90.mysql.pythonanywhere-services.com',
+        'HOST': 'localhost',
         'PORT': '3306',
     }
 }
