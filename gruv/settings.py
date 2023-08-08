@@ -86,9 +86,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'malcovarela90$gruv_sql',
         'USER': 'malcovarela90',
-        'PASSWORD': 'rHBKPbxgDZC3',
+        'PASSWORD': 'temporal2023',
         'HOST': 'malcovarela90.mysql.pythonanywhere-services.com',
-        'PORT': '',
+        'PORT': '3306',
     }
 }
 
