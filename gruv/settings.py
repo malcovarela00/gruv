@@ -84,12 +84,8 @@ WSGI_APPLICATION = 'gruv.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'gruv_psql',
-        'USER': 'postgres',
-        'PASSWORD': 'malco',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
