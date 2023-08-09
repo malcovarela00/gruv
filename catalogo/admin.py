@@ -13,8 +13,8 @@ class MyUserAdmin(UserAdmin):
 admin.site.unregister(User)
 admin.site.register(User, MyUserAdmin)
 
-AdminSite.site_header = 'Gruv'
-AdminSite.site_title = 'Gruv'
+AdminSite.site_header = 'Admin'
+AdminSite.site_title = 'Admin'
 
 class PagoClienteInline(admin.TabularInline):
     model = PagoCliente
