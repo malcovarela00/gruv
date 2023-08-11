@@ -92,3 +92,6 @@ class PagoProveedorAdmin(admin.ModelAdmin):
     list_filter = ('estado', 'opcion_pago', 'fecha_vencimiento', 'moneda', 'update')
     search_fields = ('proveedor__nombre',)
     readonly_fields = ('update',)
+
+    class Media:
+        js = ('admin/js/pago_calculator.js',)
