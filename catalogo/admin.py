@@ -72,9 +72,8 @@ class PagoClienteAdmin(admin.ModelAdmin):
             color = 'red'
         return mark_safe(f'<span style="color:{color};">{obj.get_estado_display()}</span>')
 
-    # Nombre descriptivo para la columna en el admin
     estado_coloreado.short_description = 'Estado'
-# Registramos la clase personalizada con el modelo PagoCliente
+
 admin.site.register(PagoCliente, PagoClienteAdmin)
 
 
@@ -92,6 +91,3 @@ class PagoProveedorAdmin(admin.ModelAdmin):
     list_filter = ('estado', 'opcion_pago', 'fecha_vencimiento', 'moneda', 'update')
     search_fields = ('proveedor__nombre',)
     readonly_fields = ('update',)
-
-    class Media:
-        js = ('admin/js/pago_calculator.js',)

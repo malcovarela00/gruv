@@ -1,4 +1,3 @@
-from decimal import Decimal
 from django.utils import timezone
 from django.db import models
 from django.core.validators import MinValueValidator

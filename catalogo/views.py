@@ -2,7 +2,7 @@ from django.shortcuts import render
 from .models import Viaje, PagoCliente, Proveedor, PagoProveedor, OPCIONES_DE_PAGO
 from django.contrib.admin.views.decorators import staff_member_required
 
-from django.db.models import Sum, F, Case, When, DecimalField, Value
+from django.db.models import Sum, F, Case, When, DecimalField
 
 def home(request):
     return render(request, 'home.html')
