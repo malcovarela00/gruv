@@ -2,6 +2,8 @@ from django.shortcuts import render
 from .models import Viaje, PagoCliente, Proveedor, PagoProveedor, OPCIONES_DE_PAGO
 from django.contrib.admin.views.decorators import staff_member_required
 
+from decimal import Decimal
+
 from django.db.models import Sum, F, Case, When, DecimalField
 
 def home(request):
@@ -68,4 +70,36 @@ def pago_proveedor(request):
     )
 
     return render(request, 'tabla_proveedores.html', {'proveedores_info': proveedores_info})
+
+
+@staff_member_required
+def calcular_ganancias(request):
+    proveedores = Proveedor.objects.all()
+    context = {'proveedores': proveedores}
+
+    if request.method == 'POST':
+        proveedor_id = request.POST.get('proveedor')
+        precio_proveedor = Decimal(request.POST.get('pago_proveedor', 0))
+        pago_cliente = Decimal(request.POST.get('pago_cliente', 0))
+        comision_vendedor = Decimal(request.POST.get('comision_vendedor', 0))
+
+        proveedor = Proveedor.objects.get(pk=proveedor_id)
+
+        pago_proveedor = round(precio_proveedor - (precio_proveedor * (proveedor.comision / 100)), 2)
+        ganancia_bruto = pago_cliente - pago_proveedor
+        ganancia_usd_vendedor = round(pago_cliente * (comision_vendedor / 100), 2)
+        ganancia_gruv = ganancia_bruto - ganancia_usd_vendedor
+
+        ganancia_neta_porc = round((ganancia_gruv * 100) / ganancia_bruto, 2) if ganancia_bruto != 0 else 0
+
+        context.update({
+            'comision_proveedor': proveedor.comision,
+            'pago_proveedor': pago_proveedor,
+            'ganancia_bruto': ganancia_bruto,
+            'ganancia_usd_vendedor': ganancia_usd_vendedor,
+            'ganancia_gruv': ganancia_gruv,
+            'ganancia_neta_porc': ganancia_neta_porc,
+        })
+
+    return render(request, 'calcular_ganancias.html', context)
 

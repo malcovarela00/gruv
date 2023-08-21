@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Calculadora de Ganancias</h1>
+    <form method="post" id="calculadora-form">
+        {% csrf_token %}
+        <label for="proveedor">Proveedor:</label>
+        <select name="proveedor" id="proveedor">
+            <option value="">Seleccione un proveedor</option>
+            {% for proveedor in proveedores %}
+                <option value="{{ proveedor.id }}" {% if proveedor.id == request.POST.proveedor %}selected{% endif %}>{{ proveedor.nombre }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="pago_proveedor">Precio Proveedor:</label>
+        <input type="number" name="pago_proveedor" step="0.01" value="{{ request.POST.pago_proveedor }}">
+        <br>
+        <label for="pago_cliente">Pago Cliente:</label>
+        <input type="number" name="pago_cliente" step="0.01" value="{{ request.POST.pago_cliente }}">
+        <br>
+        <label for="comision_vendedor">Comisión del Vendedor:</label>
+        <input type="number" name="comision_vendedor" step="0.01" value="{{ request.POST.comision_vendedor }}">
+        <br>
+        <button type="submit">Calcular</button>
+        <button type="button" onclick="limpiarFormulario()">Nuevo</button>
+    </form>
+    <hr>
+    <div id="resultados" {% if not pago_proveedor %}style="display: none;"{% endif %}>
+        <h2>Resultados:</h2>
+        <p>Comision Vendedor: {{ comision_proveedor }} %</p>
+        <p>Pago al Proveedor: {{ pago_proveedor }}</p>
+        <p>Ganancia Bruta: {{ ganancia_bruto }}</p>
+        <p>Ganancia USD Vendedor: ${{ ganancia_usd_vendedor }}</p>
+        <p>Ganancia Gruv: {{ ganancia_gruv }}</p>
+        <p>Ganancia Neta: {{ ganancia_neta_porc }} %</p>
+    </div>
+
+    <script>
+        function limpiarFormulario() {
+            document.getElementById("calculadora-form").reset();
+            document.getElementById("resultados").style.display = "none";
+        }
+    </script>
+{% endblock %}

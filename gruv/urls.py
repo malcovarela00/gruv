@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from catalogo.views import home, viaje_list, balance, pago_proveedor
+from catalogo.views import home, viaje_list, balance, pago_proveedor, calcular_ganancias
 
 
 urlpatterns = [
@@ -26,5 +26,6 @@ urlpatterns = [
     path('viaje-list/', viaje_list, name='viaje_list'),
     path('balance/', balance, name='balance'),
     path('proveedor-table/', pago_proveedor, name='tabla_proveedores'),
+    path('calcular-ganancias/', calcular_ganancias, name='calcular_ganancias'),
 
 ]
