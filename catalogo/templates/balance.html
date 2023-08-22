@@ -15,9 +15,9 @@
             {% for opcion, entrada, salida, saldo in saldo_por_pago %}
                 <tr>
                     <td>{{ opcion }}</td>
-                    <td>{{ entrada|floatformat:1 }}</td>
-                    <td>{{ salida|floatformat:1 }}</td>
-                    <td>{{ saldo|floatformat:1 }}</td>
+                    <td>{{ entrada|floatformat:2 }}</td>
+                    <td>{{ salida|floatformat:2 }}</td>
+                    <td>{{ saldo|floatformat:2 }}</td>
                 </tr>
             {% endfor %}
         </tbody>

@@ -16,9 +16,9 @@
             {% for proveedor_info in proveedores_info %}
             <tr>
                 <td>{{ proveedor_info.pais__nombre }}</td>
-                <td>{{ proveedor_info.saldo|floatformat:1 }}</td>
-                <td>{{ proveedor_info.pendiente|floatformat:1 }}</td>
-                <td>{{ proveedor_info.pago_en_destino|floatformat:1 }}</td>
+                <td>{{ proveedor_info.saldo|floatformat:2 }}</td>
+                <td>{{ proveedor_info.pendiente|floatformat:2 }}</td>
+                <td>{{ proveedor_info.pago_en_destino|floatformat:2 }}</td>
             </tr>
             {% endfor %}
         </tbody>
