@@ -2,6 +2,10 @@
 
 {% block content %}
     <h1>Calculadora de Ganancias</h1>
+    {% if form_incomplete %}
+        <p style="color: red;">Faltan datos en el formulario. Por favor, complete todos los campos.</p>
+    {% endif %}
+
     <form method="post" id="calculadora-form">
         {% csrf_token %}
         <label for="proveedor">Proveedor:</label>
@@ -21,24 +25,29 @@
         <label for="comision_vendedor">Comisión del Vendedor:</label>
         <input type="number" name="comision_vendedor" step="0.01" value="{{ request.POST.comision_vendedor }}">
         <br>
-        <button type="submit">Calcular</button>
-        <button type="button" onclick="limpiarFormulario()">Nuevo</button>
+        <button type="submit" class="btn btn-success">Calcular</button>
+        <button type="button" class="btn btn-primary" onclick="limpiarFormulario()">Nuevo</button>
     </form>
     <hr>
     <div id="resultados" {% if not pago_proveedor %}style="display: none;"{% endif %}>
         <h2>Resultados:</h2>
-        <p>Comision Vendedor: {{ comision_proveedor }} %</p>
-        <p>Pago al Proveedor: {{ pago_proveedor }}</p>
-        <p>Ganancia Bruta: {{ ganancia_bruto }}</p>
+        <p>Comision Proveedor: {{ comision_proveedor }}%</p>
+        <p>Pago al Proveedor: ${{ pago_proveedor }}</p>
+        <p>Ganancia Bruta: ${{ ganancia_bruto }}</p>
         <p>Ganancia USD Vendedor: ${{ ganancia_usd_vendedor }}</p>
-        <p>Ganancia Gruv: {{ ganancia_gruv }}</p>
-        <p>Ganancia Neta: {{ ganancia_neta_porc }} %</p>
+        <p>Ganancia Gruv: ${{ ganancia_gruv }}</p>
+        <p>Ganancia Neta: {{ ganancia_neta_porc }}%</p>
     </div>
 
     <script>
         function limpiarFormulario() {
             document.getElementById("calculadora-form").reset();
             document.getElementById("resultados").style.display = "none";
+            
+            // Establecer los valores de los campos a vacío
+            document.getElementById("pago_proveedor").value = "";
+            document.getElementById("pago_cliente").value = "";
+            document.getElementById("comision_vendedor").value = "";
         }
     </script>
 {% endblock %}

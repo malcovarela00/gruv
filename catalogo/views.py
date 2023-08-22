@@ -77,29 +77,54 @@ def calcular_ganancias(request):
     proveedores = Proveedor.objects.all()
     context = {'proveedores': proveedores}
 
+    form_incomplete = False  # Variable para controlar el mensaje de error
+
     if request.method == 'POST':
         proveedor_id = request.POST.get('proveedor')
-        precio_proveedor = Decimal(request.POST.get('pago_proveedor', 0))
-        pago_cliente = Decimal(request.POST.get('pago_cliente', 0))
-        comision_vendedor = Decimal(request.POST.get('comision_vendedor', 0))
+        precio_proveedor = request.POST.get('pago_proveedor')
+        pago_cliente = request.POST.get('pago_cliente')
+        comision_vendedor = request.POST.get('comision_vendedor')
 
-        proveedor = Proveedor.objects.get(pk=proveedor_id)
+        if not (proveedor_id and precio_proveedor and pago_cliente and comision_vendedor):
+            form_incomplete = True
+        else:
+            # Convertir los valores a Decimal solo si no están vacíos
+            precio_proveedor = Decimal(precio_proveedor) if precio_proveedor else Decimal('0')
+            pago_cliente = Decimal(pago_cliente) if pago_cliente else Decimal('0')
+            comision_vendedor = Decimal(comision_vendedor) if comision_vendedor else Decimal('0')
 
-        pago_proveedor = round(precio_proveedor - (precio_proveedor * (proveedor.comision / 100)), 2)
-        ganancia_bruto = pago_cliente - pago_proveedor
-        ganancia_usd_vendedor = round(pago_cliente * (comision_vendedor / 100), 2)
-        ganancia_gruv = ganancia_bruto - ganancia_usd_vendedor
+            proveedor = Proveedor.objects.get(pk=proveedor_id)
+            pago_proveedor = round(precio_proveedor - (precio_proveedor * (proveedor.comision / 100)), 2)
+            ganancia_bruto = pago_cliente - pago_proveedor
+            ganancia_usd_vendedor = round(pago_cliente * (comision_vendedor / 100), 2)
+            ganancia_gruv = ganancia_bruto - ganancia_usd_vendedor
 
-        ganancia_neta_porc = round((ganancia_gruv * 100) / ganancia_bruto, 2) if ganancia_bruto != 0 else 0
+            ganancia_neta_porc = round((ganancia_gruv * 100) / ganancia_bruto, 2) if ganancia_bruto != 0 else 0
 
+            context.update({
+                'comision_proveedor': proveedor.comision,
+                'pago_proveedor': pago_proveedor,
+                'ganancia_bruto': ganancia_bruto,
+                'ganancia_usd_vendedor': ganancia_usd_vendedor,
+                'ganancia_gruv': ganancia_gruv,
+                'ganancia_neta_porc': ganancia_neta_porc,
+            })
+            
+            # Si el formulario está incompleto o se hizo clic en "Nuevo", restablecer valores
+    if form_incomplete or 'limpiar_formulario' in request.POST:
         context.update({
-            'comision_proveedor': proveedor.comision,
-            'pago_proveedor': pago_proveedor,
-            'ganancia_bruto': ganancia_bruto,
-            'ganancia_usd_vendedor': ganancia_usd_vendedor,
-            'ganancia_gruv': ganancia_gruv,
-            'ganancia_neta_porc': ganancia_neta_porc,
-        })
+            'pago_proveedor': None,
+            'pago_cliente': None,
+            'comision_vendedor': None,
+            'comision_proveedor': None,
+            'ganancia_bruto': None,
+            'ganancia_usd_vendedor': None,
+            'ganancia_gruv': None,
+            'ganancia_neta_porc': None,
+    })
+
+    context['form_incomplete'] = form_incomplete
 
     return render(request, 'calcular_ganancias.html', context)
+
 
