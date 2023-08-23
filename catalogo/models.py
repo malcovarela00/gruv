@@ -82,6 +82,7 @@ class PagoCliente(models.Model):
     monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA)
     fecha_vencimiento = models.DateField()
+    fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -129,6 +130,7 @@ class PagoProveedor(models.Model):
     precio_proveedor = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA)
     fecha_vencimiento = models.DateField(verbose_name='Fecha de Entrada en Gastos')
+    fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
