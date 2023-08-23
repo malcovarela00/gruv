@@ -3,6 +3,8 @@ from .models import Viaje, PagoCliente, Proveedor, PagoProveedor, OPCIONES_DE_PA
 from django.contrib.admin.views.decorators import staff_member_required
 
 from decimal import Decimal
+from datetime import datetime
+from django.utils import timezone
 
 from django.db.models import Sum, F, Case, When, DecimalField
 
@@ -16,9 +18,30 @@ def viaje_list(request):
 
 @staff_member_required
 def balance(request):
-    # Obtener todos los pagos de clientes y proveedores
-    pagos_cliente = PagoCliente.objects.all()
-    pagos_proveedor = PagoProveedor.objects.all()
+
+    if request.method == 'GET':
+        # Valores predeterminados para las fechas
+        start_date = datetime.now().date()
+        end_date = datetime.now().date()
+        
+        # Obtener las fechas del formulario si se proporcionan
+        start_date_str = request.GET.get('start_date', start_date.strftime('%Y-%m-%d'))
+        end_date_str = request.GET.get('end_date', end_date.strftime('%Y-%m-%d'))
+
+        # Convertir las fechas a objetos datetime.date
+        start_date = datetime.strptime(start_date_str, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_date_str, '%Y-%m-%d').date()
+
+        # Convertir las fechas a objetos datetime con zona horaria
+        start_datetime = timezone.make_aware(datetime.combine(start_date, datetime.min.time()))
+        end_datetime = timezone.make_aware(datetime.combine(end_date, datetime.max.time()))
+
+    # Filtrar los pagos de clientes y proveedores por rango de fechas
+        pagos_cliente = PagoCliente.objects.filter(fecha_creacion__gte=start_datetime, fecha_creacion__lte=end_datetime)
+        pagos_proveedor = PagoProveedor.objects.filter(fecha_creacion__gte=start_datetime, fecha_creacion__lte=end_datetime)
+    else:
+        pagos_cliente = PagoCliente.objects.all()
+        pagos_proveedor = PagoProveedor.objects.all()
 
     # Calcular la suma de las entradas por opciones de pago del cliente
     entradas_por_pago_cliente = pagos_cliente.annotate(
@@ -43,10 +66,10 @@ def balance(request):
         entrada = next((item['total_entrada'] for item in entradas_por_pago_cliente if item['opcion_pago'] == opcion), 0)
         salida = next((item['total_salida'] for item in salidas_por_pago_proveedor if item['opcion_pago'] == opcion), 0)
         saldo = entrada - salida
-        saldo_por_pago.append((opcion, entrada, salida, saldo))
+        saldo_por_pago.append((opcion.upper(), entrada, salida, saldo))
 
-    # Renderizar la plantilla con la información calculada
-    return render(request, 'balance.html', {'saldo_por_pago': saldo_por_pago})
+    # Renderizar la plantilla con la información calculada y las fechas
+    return render(request, 'balance.html', {'saldo_por_pago': saldo_por_pago, 'start_date': start_date, 'end_date': end_date})
 
 @staff_member_required
 def pago_proveedor(request):

@@ -59,9 +59,9 @@ class ViajeAdmin(admin.ModelAdmin):
 
 class PagoClienteAdmin(admin.ModelAdmin):
     list_display = ('viaje', 'estado_coloreado', 'opcion_pago', 'monto', 'moneda')
-    list_filter = ('estado', 'opcion_pago', 'fecha_vencimiento', 'moneda', 'update')
+    list_filter = ('estado', 'opcion_pago', 'fecha_vencimiento', 'moneda', 'update', 'fecha_creacion')
     search_fields = ('viaje__producto',)
-    readonly_fields = ('update',)
+    readonly_fields = ('update', 'fecha_creacion')
 
     def estado_coloreado(self, obj):
         if obj.estado == 'confirmado':
@@ -88,6 +88,6 @@ class ProveedorAdmin(admin.ModelAdmin):
 @admin.register(PagoProveedor)
 class PagoProveedorAdmin(admin.ModelAdmin):
     list_display = ('proveedor', 'estado', 'opcion_pago', 'precio_proveedor', 'moneda', 'update')
-    list_filter = ('estado', 'opcion_pago', 'fecha_vencimiento', 'moneda', 'update')
+    list_filter = ('estado', 'opcion_pago', 'fecha_vencimiento', 'moneda', 'update', 'fecha_creacion')
     search_fields = ('proveedor__nombre',)
-    readonly_fields = ('update',)
+    readonly_fields = ('update', 'fecha_creacion')
