@@ -7,6 +7,7 @@ from datetime import datetime
 from django.utils import timezone
 
 from django.db.models import Sum, F, Case, When, DecimalField
+from django.views.generic import TemplateView
 
 def home(request):
     return render(request, 'home.html')
@@ -151,3 +152,24 @@ def calcular_ganancias(request):
     return render(request, 'calcular_ganancias.html', context)
 
 
+class VendedoresReporteView(TemplateView):
+    template_name = 'reporte_vendedores.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Realiza las consultas necesarias para obtener la información requerida
+        vendedores = (
+            Viaje.objects.select_related('vendedor')
+            .annotate(volumen_ventas=Sum('pagocliente__monto'))
+            .annotate(ganancia_usd=Sum('saldo__ganancia_usd_vendedor'))
+            .values('vendedor__nombre', 'volumen_ventas', 'ganancia_usd')
+            .order_by('-volumen_ventas')
+        )
+
+        # Agrega el puesto a cada vendedor
+        for i, vendedor in enumerate(vendedores, start=1):
+            vendedor['puesto'] = i
+
+        context['vendedores'] = vendedores
+        return context

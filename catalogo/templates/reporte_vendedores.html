@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Reporte de Vendedores</h2>
+    <table id='reporVendedor' class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Puesto</th>
+                <th>Vendedor</th>
+                <th>Volumen de ventas</th>
+                <th>Ganancia en USD</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vendedor in vendedores %}
+                <tr>
+                    <td>{{ vendedor.puesto }}</td>
+                    <td>{{ vendedor.vendedor__nombre }}</td>
+                    <td>{{ vendedor.volumen_ventas }}</td>
+                    <td>{{ vendedor.ganancia_usd }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
