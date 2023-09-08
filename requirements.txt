@@ -1,4 +1,5 @@
 whitenoise==6.5.0
+django-admin-argon-dashboard==1.0.16
 Django==4.2.2
 asgiref==3.7.2
 beautifulsoup4==4.12.2

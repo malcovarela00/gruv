@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ['admin.gruvtravel.es']
 
 INSTALLED_APPS = [
     #'jazzmin',
+    'admin_argon.apps.AdminArgonConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -42,10 +43,10 @@ INSTALLED_APPS = [
     'bootstrap5',
 ]
 
-JAZZMIN_UI_TWEAKS = {
-    "theme": "flatly",
-    "dark_mode_theme": "litera",
-}
+# JAZZMIN_UI_TWEAKS = {
+#     "theme": "flatly",
+#     "dark_mode_theme": "litera",
+# }
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
