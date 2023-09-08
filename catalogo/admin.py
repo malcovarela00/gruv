@@ -51,7 +51,6 @@ class ClienteAdmin(admin.ModelAdmin):
 class ViajeAdmin(admin.ModelAdmin):
     inlines = [PagoClienteInline, PagoProveedorInline]
     list_display = ('cliente', 'producto', 'localizador', 'fecha_viaje', 'fecha_vuelta', 'vendedor', 'comision_vendedor')
-    fields = [('cliente', 'localizador'), ('producto', 'pax'), ('fecha_viaje', 'fecha_vuelta'), ('vendedor', 'comision_vendedor'), ('update', 'fecha_creacion')]
     search_fields = ('cliente__nombre', 'producto', 'localizador')
     list_filter = ('fecha_viaje', 'vendedor', )
     readonly_fields = ('update', 'fecha_creacion')
