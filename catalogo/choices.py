@@ -1,4 +1,5 @@
 OPCIONES_DE_PAGO = [
+    ('pendiente', 'Pendiente'),
     ('wise', 'WISE'),
     ('santander', 'SANTANDER'),
     ('bbva', 'BBVA'),
@@ -7,17 +8,14 @@ OPCIONES_DE_PAGO = [
     ('cta-cc usd', 'Cuenta Corriente (CTA-CC USD)'),
     ('pago destino', 'Pago destino'),
     ('cash', 'Cash'),
-    ('pendiente', 'Pendiente'),
+    ('cancelado', 'Cancelado'),
 ]
+
+OPCIONES_DE_MODEDA = [
+    ('euro', '€ (euro)'),
+    ('dolar', '$ (dolar)')]
 
 ESTADO = [
     ('pendiente', 'Pendiente'),
     ('confirmado', 'Confirmado'),
-    ('cancelado', 'Cancelado'),
 ]
-
-EURO = 'euro'
-DOLAR = 'dolar'
-OPCIONES_DE_MODEDA = [
-    (EURO, '€ (euro)'),
-    (DOLAR, '$ (dolar)')]

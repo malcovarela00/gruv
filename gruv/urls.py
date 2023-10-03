@@ -17,7 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
-from catalogo.views import home, viaje_list, balance, pago_proveedor, calcular_ganancias, VendedoresReporteView
+from catalogo.views import (home, 
+                            viaje_list,
+                            VendedoresReporteView)
+                            # balance,
+                            # pago_proveedor,
+                            # calcular_ganancias,
 
 
 urlpatterns = [
@@ -25,9 +30,9 @@ urlpatterns = [
     path('', include('admin_argon.urls')),
     path('admin/', admin.site.urls),
     path('viaje-list/', viaje_list, name='viaje_list'),
-    path('balance/', balance, name='balance'),
-    path('proveedor-table/', pago_proveedor, name='tabla_proveedores'),
-    path('calcular-ganancias/', calcular_ganancias, name='calcular_ganancias'),
+    # path('balance/', balance, name='balance'),
+    # path('proveedor-table/', pago_proveedor, name='tabla_proveedores'),
+    # path('calcular-ganancias/', calcular_ganancias, name='calcular_ganancias'),
     path('reporte_vendedores/', VendedoresReporteView.as_view(), name='reporte_vendedores'),
 
 ]

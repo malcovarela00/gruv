@@ -1,7 +1,6 @@
 from django.utils import timezone
 from django.db import models
 from django.core.validators import MinValueValidator
-from django.forms import ValidationError
 from .choices import OPCIONES_DE_PAGO, ESTADO, OPCIONES_DE_MODEDA
 
 
@@ -16,6 +15,21 @@ class Pais(models.Model):
         ordering = ['nombre']
         verbose_name = 'Pais'
         verbose_name_plural = 'Paises'
+
+
+class Proveedor(models.Model):
+    nombre = models.CharField(max_length=100)
+    comision = models.DecimalField(max_digits=4, decimal_places=2, default=1.00)
+    pais = models.ForeignKey('Pais', on_delete=models.CASCADE)
+    update = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.nombre
+
+    class Meta:
+        ordering = ['nombre']
+        verbose_name = 'Proveedor'
+        verbose_name_plural = 'Proveedores'
 
 
 class Vendedor(models.Model):
@@ -39,7 +53,6 @@ class Vendedor(models.Model):
 class Cliente(models.Model):
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100, blank=True, null=True)
-    dni = models.CharField(max_length=20, unique=True, verbose_name='DNI/Pasaporte/ID')
     telefono = models.CharField(max_length=20, blank=True, null=True)
     email = models.EmailField(blank=True, null=True)
     pais = models.ForeignKey('Pais', on_delete=models.CASCADE, blank=True, null=True)
@@ -59,120 +72,51 @@ class Viaje(models.Model):
     pax = models.PositiveSmallIntegerField(blank=True, null=True)
     fecha_viaje = models.DateField()
     fecha_vuelta = models.DateField()
+
     vendedor = models.ForeignKey('Vendedor', on_delete=models.CASCADE)
     comision_vendedor = models.DecimalField(max_digits=4, decimal_places=2, default=0.00, validators=[MinValueValidator(0)], verbose_name='Comision Vendedor (%)')
-    fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
-    update = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.producto
-
-    def clean(self):
-        super(Viaje, self).clean()
-
-        if self.fecha_vuelta is not None and self.fecha_viaje is not None:
-            if self.fecha_vuelta < self.fecha_viaje:
-                raise ValidationError("La Fecha de Vuelta debe ser posterior a la Fecha de Viaje.")
-
-
-class PagoCliente(models.Model):
-    viaje = models.OneToOneField('Viaje', on_delete=models.CASCADE)
-    estado = models.CharField(max_length=10, choices=ESTADO)
-    opcion_pago = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
-    monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA)
-    fecha_vencimiento = models.DateField()
-    fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
-    update = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return str(self.viaje) + ' (' + self.estado + ')'
-
-    def save(self, *args, **kwargs):
-        if self.opcion_pago == 'usdt':
-            self.moneda = 'dolar'
-        else:
-            self.moneda = 'euro'
-        super().save(*args, **kwargs)
-
-    def clean(self):
-        super(PagoCliente, self).clean()
-
-        if self.fecha_vencimiento < timezone.localdate():
-            raise ValidationError("La Fecha de Vencimiento: debe ser posterior a la fecha de hoy.")
-
-    class Meta:
-        ordering = ['-update']
-        verbose_name = 'Pago Cliente'
-        verbose_name_plural = 'Pagos Clientes'
-
-
-class Proveedor(models.Model):
-    nombre = models.CharField(max_length=100)
-    comision = models.DecimalField(max_digits=4, decimal_places=2, default=1.00)
-    pais = models.ForeignKey('Pais', on_delete=models.CASCADE)
-    update = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.nombre
-
-    class Meta:
-        ordering = ['nombre']
-        verbose_name = 'Proveedor'
-        verbose_name_plural = 'Proveedores'
-
-
-class PagoProveedor(models.Model):
-    proveedor = models.ForeignKey('Proveedor', on_delete=models.CASCADE)
-    viaje = models.OneToOneField('Viaje', on_delete=models.CASCADE)
-    estado = models.CharField(max_length=10, choices=ESTADO)
-    opcion_pago = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
-    precio_proveedor = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA)
-    fecha_vencimiento = models.DateField(verbose_name='Fecha de Entrada en Gastos')
-    fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
-    update = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return str(self.proveedor.nombre) + ' (' + self.estado + ')'
-
-    def save(self, *args, **kwargs):
-        if self.opcion_pago == 'santander':
-            self.moneda = 'euro'
-        else:
-            self.moneda = 'dolar'
-        super().save(*args, **kwargs)
-
-    def clean(self):
-        super(PagoProveedor, self).clean()
-
-        if self.fecha_vencimiento < timezone.localdate():
-            raise ValidationError("La Fecha de Entrada en Gastos: debe ser posterior a la fecha de hoy.")
-
-    class Meta:
-        ordering = ['-update']
-        verbose_name = 'Pago Proveedor'
-        verbose_name_plural = 'Pagos Proveedores'
-
-
-class Saldo(models.Model):
-    viaje = models.OneToOneField('Viaje', on_delete=models.CASCADE)
-    
     pago_cliente_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    pago_cliente_estado = models.CharField(max_length=10, choices=ESTADO)
-    pago_cliente_opcion_pago = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
-    pago_cliente_moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA)
-    
+    pago_cliente_estado = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
+    pago_cliente_moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA, editable=False)
+    pago_cliente_fecha_vencimiento = models.DateField()
+
+    proveedor = models.ForeignKey('Proveedor', on_delete=models.CASCADE)
     pago_proveedor_estado = models.CharField(max_length=10, choices=ESTADO)
-    pago_proveedor_opcion_pago = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
-    pago_proveedor_precio = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    pago_proveedor_moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA)
-    pago_proveedor = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
+    pago_proveedor_precio = models.DecimalField(max_digits=10, decimal_places=2)
+    pago_proveedor_moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA, editable=False)
+    pago_proveedor_fecha_vencimiento = models.DateField(verbose_name='Fecha de Entrada en Gastos')
+
+    pago_proveedor = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     
     ganancia_bruto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
     ganancia_usd_vendedor = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
     ganancia_gruv = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
     ganancia_neta_porc = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
 
+    fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
+    update = models.DateTimeField(auto_now=True)
+
     def __str__(self):
-        return f"Saldo para {self.viaje}"
+        return f'{self.cliente} - {self.producto}'
+
+    def save(self, *args, **kwargs):
+        if self.pago_cliente_estado in ['santander', 'bbva', 'cta-cc €']:
+            self.pago_cliente_moneda = 'euro'
+        else:
+            self.pago_cliente_moneda = 'dolar'
+
+        self.pago_proveedor = round(self.pago_proveedor_precio - (self.pago_proveedor_precio * (self.proveedor.comision / 100)), 2)
+        self.ganancia_bruto = self.pago_cliente_monto - self.pago_proveedor
+        self.ganancia_usd_vendedor = round(self.pago_cliente_monto * (self.comision_vendedor / 100), 2)
+        self.ganancia_gruv = self.ganancia_bruto - self.ganancia_usd_vendedor
+        self.ganancia_neta_porc = round((self.ganancia_gruv * 100) / self.ganancia_bruto, 2) if self.ganancia_bruto != 0 else 0
+
+        self.pago_proveedor_moneda = 'dolar'
+
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ['-update']
+
+

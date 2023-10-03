@@ -1,9 +1,8 @@
 from django.contrib import admin
-from .models import Cliente, Pais, Vendedor, Viaje, PagoCliente, Proveedor, PagoProveedor
+from .models import Pais, Proveedor, Vendedor, Cliente, Viaje
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
-from django.utils.safestring import mark_safe
 
 
 
@@ -16,19 +15,19 @@ admin.site.register(User, MyUserAdmin)
 AdminSite.site_header = 'Admin'
 AdminSite.site_title = 'Admin'
 
-class PagoClienteInline(admin.TabularInline):
-    model = PagoCliente
-    extra = 1
-
-class PagoProveedorInline(admin.TabularInline):
-    model = PagoProveedor
-    extra = 1
-
 
 @admin.register(Pais)
 class PaisAdmin(admin.ModelAdmin):
     list_display = ('code_pais', 'nombre')
     search_fields = ('code_pais', 'nombre')
+
+
+@admin.register(Proveedor)
+class ProveedorAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'comision', 'pais', 'update')
+    list_filter = ('pais', 'update')
+    search_fields = ('nombre',)
+    readonly_fields = ('update',)
 
 
 @admin.register(Vendedor)
@@ -41,7 +40,7 @@ class VendedorAdmin(admin.ModelAdmin):
 
 @admin.register(Cliente)
 class ClienteAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'apellido', 'email', 'telefono', 'dni')
+    list_display = ('nombre', 'apellido', 'email', 'telefono')
     search_fields = ('nombre', 'apellido', 'email', 'telefono')
     list_filter = ('pais', 'update')
     readonly_fields = ('update',)
@@ -49,44 +48,12 @@ class ClienteAdmin(admin.ModelAdmin):
 
 @admin.register(Viaje)
 class ViajeAdmin(admin.ModelAdmin):
-    inlines = [PagoClienteInline, PagoProveedorInline]
-    list_display = ('cliente', 'producto', 'localizador', 'fecha_viaje', 'fecha_vuelta', 'vendedor', 'comision_vendedor')
+    list_display = ('cliente', 'producto', 'localizador', 'fecha_viaje', 'pago_cliente_monto', 'vendedor')
+    fields = [('cliente', 'pax'), ('producto', 'localizador'), ('fecha_viaje', 'fecha_vuelta'), 
+              ('vendedor', 'comision_vendedor'), ('pago_cliente_monto', 'pago_cliente_estado', 'pago_cliente_fecha_vencimiento'),
+              ('proveedor', 'pago_proveedor_estado', 'pago_proveedor_precio'), 'pago_proveedor_fecha_vencimiento',]
     search_fields = ('cliente__nombre', 'producto', 'localizador')
-    list_filter = ('fecha_viaje', 'vendedor', )
+    list_filter = ('fecha_viaje', 'proveedor__nombre', 'pax', 'proveedor', 'update')
     readonly_fields = ('update', 'fecha_creacion')
 
 
-class PagoClienteAdmin(admin.ModelAdmin):
-    list_display = ('viaje', 'estado_coloreado', 'opcion_pago', 'monto', 'moneda')
-    list_filter = ('estado', 'opcion_pago', 'fecha_vencimiento', 'moneda', 'update', 'fecha_creacion')
-    search_fields = ('viaje__producto',)
-    readonly_fields = ('update', 'fecha_creacion')
-
-    def estado_coloreado(self, obj):
-        if obj.estado == 'confirmado':
-            color = 'green' 
-        elif obj.estado == 'pendiente':
-            color = 'orange'
-        else:
-            color = 'red'
-        return mark_safe(f'<span style="color:{color};">{obj.get_estado_display()}</span>')
-
-    estado_coloreado.short_description = 'Estado'
-
-admin.site.register(PagoCliente, PagoClienteAdmin)
-
-
-@admin.register(Proveedor)
-class ProveedorAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'comision', 'pais', 'update')
-    list_filter = ('pais', 'comision', 'update')
-    search_fields = ('nombre',)
-    readonly_fields = ('update',)
-
-
-@admin.register(PagoProveedor)
-class PagoProveedorAdmin(admin.ModelAdmin):
-    list_display = ('proveedor', 'estado', 'opcion_pago', 'precio_proveedor', 'moneda', 'update')
-    list_filter = ('estado', 'opcion_pago', 'fecha_vencimiento', 'moneda', 'update', 'fecha_creacion')
-    search_fields = ('proveedor__nombre',)
-    readonly_fields = ('update', 'fecha_creacion')
