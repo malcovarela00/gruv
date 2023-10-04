@@ -120,3 +120,18 @@ class Viaje(models.Model):
         ordering = ['-update']
 
 
+class Transferencia(models.Model):
+    sale = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
+    sale_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    entra = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
+    entra_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    observacion = models.CharField(max_length=300, blank=True, null=True, verbose_name='Observación')
+    
+    fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
+    update = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.sale
+
+    class Meta:
+        ordering = ['-update']
