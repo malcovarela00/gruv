@@ -91,7 +91,55 @@ def pago_proveedor(request):
         ),
     )
 
-    return render(request, 'tabla_proveedores.html', {'proveedores_info': proveedores_info})
+    return proveedores_info
+
+
+class VendedoresReporteView(TemplateView):
+    template_name = 'reporte_vendedores.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Realiza las consultas necesarias para obtener la información requerida
+        vendedores = (
+            Viaje.objects.select_related('vendedor')
+            .annotate(volumen_ventas=Sum('pago_cliente_monto'))
+            .annotate(ganancia_usd=Sum('ganancia_usd_vendedor'))
+            .values('vendedor__nombre', 'volumen_ventas', 'ganancia_usd')
+            .order_by('-volumen_ventas')
+        )
+
+        # Agrega el puesto a cada vendedor
+        for i, vendedor in enumerate(vendedores, start=1):
+            vendedor['puesto'] = i
+
+        context['vendedores'] = vendedores
+        return context
+
+from django.views import View
+
+class TablasCombinadasView(View):
+    def get(self, request):
+        proveedores_info = pago_proveedor(request)
+
+        # Obtener la información requerida para la tabla de vendedores
+        vendedores = (
+            Viaje.objects.select_related('vendedor')
+            .annotate(volumen_ventas=Sum('pago_cliente_monto'))
+            .annotate(ganancia_usd=Sum('ganancia_usd_vendedor'))
+            .values('vendedor__nombre', 'volumen_ventas', 'ganancia_usd')
+            .order_by('-volumen_ventas')
+        )
+
+        # Agrega el puesto a cada vendedor
+        for i, vendedor in enumerate(vendedores, start=1):
+            vendedor['puesto'] = i
+
+        return render(request, 'tablas_combinadas.html', {'proveedores_info': proveedores_info, 'vendedores': vendedores})
+
+
+
+
 
 
 # @staff_member_required
@@ -148,64 +196,3 @@ def pago_proveedor(request):
 #     context['form_incomplete'] = form_incomplete
 
 #     return render(request, 'calcular_ganancias.html', context)
-
-
-class VendedoresReporteView(TemplateView):
-    template_name = 'reporte_vendedores.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # Realiza las consultas necesarias para obtener la información requerida
-        vendedores = (
-            Viaje.objects.select_related('vendedor')
-            .annotate(volumen_ventas=Sum('pago_cliente_monto'))
-            .annotate(ganancia_usd=Sum('ganancia_usd_vendedor'))
-            .values('vendedor__nombre', 'volumen_ventas', 'ganancia_usd')
-            .order_by('-volumen_ventas')
-        )
-
-        # Agrega el puesto a cada vendedor
-        for i, vendedor in enumerate(vendedores, start=1):
-            vendedor['puesto'] = i
-
-        context['vendedores'] = vendedores
-        return context
-
-from django.views import View
-
-class TablasCombinadasView(View):
-    def get(self, request):
-        
-        proveedores_info = Viaje.objects.values('proveedor__pais__nombre').annotate(
-        saldo=Sum('pago_proveedor_precio', default=0,),
-        pendiente=Sum(
-            Case(
-                When(pago_proveedor_estado='pendiente', then=F('pago_proveedor_precio')),
-                default=0,
-                output_field=DecimalField(max_digits=12, decimal_places=2)
-            )
-        ),
-        pago_en_destino=Sum(
-            Case(
-                When(pago_proveedor_estado='pago destino', then=F('pago_proveedor_precio')),
-                default=0,
-                output_field=DecimalField(max_digits=12, decimal_places=2)
-            )
-        ),
-    )
-
-        # Obtener la información requerida para la tabla de vendedores
-        vendedores = (
-            Viaje.objects.select_related('vendedor')
-            .annotate(volumen_ventas=Sum('pago_cliente_monto'))
-            .annotate(ganancia_usd=Sum('ganancia_usd_vendedor'))
-            .values('vendedor__nombre', 'volumen_ventas', 'ganancia_usd')
-            .order_by('-volumen_ventas')
-        )
-
-        # Agrega el puesto a cada vendedor
-        for i, vendedor in enumerate(vendedores, start=1):
-            vendedor['puesto'] = i
-
-        return render(request, 'tablas_combinadas.html', {'proveedores_info': proveedores_info, 'vendedores': vendedores})
