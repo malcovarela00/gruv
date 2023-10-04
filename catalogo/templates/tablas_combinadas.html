@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Reporte de Vendedores y Pagos de Proveedores</h1>
+    <table id='reporVendedor' class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>Puesto</th>
+                <th>Vendedor</th>
+                <th>Volumen de ventas</th>
+                <th>Ganancia en USD</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for vendedor in vendedores %}
+                <tr>
+                    <td>{{ vendedor.puesto }}</td>
+                    <td>{{ vendedor.vendedor__nombre }}</td>
+                    <td>{{ vendedor.volumen_ventas }}</td>
+                    <td>{{ vendedor.ganancia_usd }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <table id="pagoProvee" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>País</th>
+                <th>Saldo</th>
+                <th>Pendiente</th>
+                <th>Pago en Destino</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for proveedor_info in proveedores_info %}
+            <tr>
+                <td>{{ proveedor_info.proveedor__pais__nombre }}</td>
+                <td>{{ proveedor_info.saldo|floatformat:2 }}</td>
+                <td>{{ proveedor_info.pendiente|floatformat:2 }}</td>
+                <td>{{ proveedor_info.pago_en_destino|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
