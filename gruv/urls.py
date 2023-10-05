@@ -12,6 +12,5 @@ urlpatterns = [
     path('', include('admin_datta.urls')),
     path('admin/', admin.site.urls),
     path('viaje-list/', viaje_list, name='viaje_list'),
-    #path('balance/', balance, name='balance'),
     path('tablas-combinadas/', TablasCombinadasView.as_view(), name='tablas-combinadas'),
 ]
