@@ -14,15 +14,20 @@
                 <th>Fecha Vuelta</th>
                 <th>Vendedor</th>
                 <th>Comision Vendedor (%)</th>
+
                 <th>Pago Cliente Monto</th>
                 <th>Pago Cliente Estado</th>
-                <th>Pago Cliente Opcion Pago</th>
                 <th>Pago Cliente Moneda</th>
+                <th>Pago Cliente Vencimiento</th>
+
+                <th>Proveedor</th>
                 <th>Pago Proveedor Estado</th>
-                <th>Pago Proveedor Opcion Pago</th>
                 <th>Pago Proveedor Precio</th>
                 <th>Pago Proveedor Moneda</th>
+                <th>Pago Proveedor Vencimiento</th>
+
                 <th>Pago Proveedor</th>
+
                 <th>Ganancia Bruto</th>
                 <th>Ganancia USD Vendedor</th>
                 <th>Ganancia GRUV</th>
@@ -41,19 +46,24 @@
                 <td>{{ viaje.fecha_vuelta }}</td>
                 <td>{{ viaje.vendedor }}</td>
                 <td>{{ viaje.comision_vendedor }}</td>
-                <td>{{ viaje.saldo.pago_cliente_monto }}</td>
-                <td data-estado="{{ viaje.saldo.pago_cliente_estado }}">{{ viaje.saldo.pago_cliente_estado }}</td>
-                <td>{{ viaje.saldo.pago_cliente_opcion_pago }}</td>
-                <td>{{ viaje.saldo.pago_cliente_moneda }}</td>
-                <td data-estado="{{ viaje.saldo.pago_proveedor_estado }}">{{ viaje.saldo.pago_proveedor_estado }}</td>
-                <td>{{ viaje.saldo.pago_proveedor_opcion_pago }}</td>
-                <td>{{ viaje.saldo.pago_proveedor_precio }}</td>
-                <td>{{ viaje.saldo.pago_proveedor_moneda }}</td>
-                <td>{{ viaje.saldo.pago_proveedor }}</td>
-                <td>{{ viaje.saldo.ganancia_bruto }}</td>
-                <td>{{ viaje.saldo.ganancia_usd_vendedor }}</td>
-                <td>{{ viaje.saldo.ganancia_gruv }}</td>
-                <td>{{ viaje.saldo.ganancia_neta_porc }}</td>
+
+                <td>{{ viaje.pago_cliente_monto }}</td>
+                <td data-estado="{{ viaje.pago_cliente_estado }}">{{ viaje.pago_cliente_estado }}</td>
+                <td>{{ viaje.pago_cliente_moneda }}</td>
+                <td>{{ viaje.pago_cliente_fecha_vencimiento }}</td>
+
+                <td>{{ viaje.proveedor }}</td>
+                <td data-estado="{{ viaje.pago_proveedor_estado }}">{{ viaje.pago_proveedor_estado }}</td>
+                <td>{{ viaje.pago_proveedor_precio }}</td>
+                <td>{{ viaje.pago_proveedor_moneda }}</td>
+                <td>{{ viaje.pago_proveedor_fecha_vencimiento }}</td>
+
+                <td>{{ viaje.pago_proveedor }}</td>
+
+                <td>{{ viaje.ganancia_bruto }}</td>
+                <td>{{ viaje.ganancia_usd_vendedor }}</td>
+                <td>{{ viaje.ganancia_gruv }}</td>
+                <td>{{ viaje.ganancia_neta_porc }}</td>
             </tr>
             {% endfor %}
         </tbody>
