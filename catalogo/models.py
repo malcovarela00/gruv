@@ -135,3 +135,38 @@ class Transferencia(models.Model):
 
     class Meta:
         ordering = ['-update']
+
+
+class Plan(models.Model):
+    cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE)
+    monto_financiado = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name='Monto a Financiar')
+    cantidad_cuotas = models.PositiveSmallIntegerField(verbose_name='Cantidad de Cuotas')
+    monto_por_cuota = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name='Monto por Cuota')
+
+    fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
+    update = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.cliente + self.monto_financiado
+
+    class Meta:
+        ordering = ['-update']
+        verbose_name = 'Plan de Pago'
+        verbose_name_plural = 'Plan de Pagos'
+
+
+class Cuota(models.Model):
+    plan = models.ForeignKey('Plan', on_delete=models.CASCADE)
+    tipo_cuota = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
+    monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    numero_cuota = models.PositiveSmallIntegerField(verbose_name='Número de Cuota')
+    saldo = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
+    update = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.plan + self.numero_cuota
+
+    class Meta:
+        ordering = ['-update']

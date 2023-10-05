@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from .models import Viaje, Proveedor, OPCIONES_DE_PAGO
 from django.contrib.admin.views.decorators import staff_member_required
+from django.views import View
 
 from decimal import Decimal
 from datetime import datetime
@@ -12,13 +13,14 @@ from django.views.generic import TemplateView
 def home(request):
     return render(request, 'home.html')
 
+
 @staff_member_required
 def viaje_list(request):
     viajes = Viaje.objects.all()
     return render(request, 'viaje_list.html', {'viajes': viajes})
 
-@staff_member_required
-def balance(request):
+
+def obtener_balance(request):
 
     if request.method == 'GET':
         # Valores predeterminados para las fechas
@@ -63,14 +65,13 @@ def balance(request):
     saldo_por_pago = []
     for opcion, _ in OPCIONES_DE_PAGO:
         entrada = next((item['total_entrada'] for item in entradas_por_pago_cliente if item['pago_cliente_estado'] == opcion), 0)
-        salida = next((item['total_salida'] for item in salidas_por_pago_proveedor if item['pago_cliente_estado'] == opcion), 0)
+        salida = next((item['total_salida'] for item in salidas_por_pago_proveedor if item['pago_proveedor_estado'] == opcion), 0)
         saldo = entrada - salida
         saldo_por_pago.append((opcion.upper(), entrada, salida, saldo))
 
-    # Renderizar la plantilla con la información calculada y las fechas
-    return render(request, 'balance.html', {'saldo_por_pago': saldo_por_pago, 'start_date': start_date, 'end_date': end_date})
+    return saldo_por_pago, start_date, end_date
 
-@staff_member_required
+
 def pago_proveedor(request):
     # Obtener la información requerida para la tabla
     proveedores_info = Viaje.objects.values('proveedor__pais__nombre').annotate(
@@ -94,51 +95,34 @@ def pago_proveedor(request):
     return proveedores_info
 
 
-class VendedoresReporteView(TemplateView):
-    template_name = 'reporte_vendedores.html'
+def vendedores_reporte(self, **kwargs):
+    vendedores = (
+        Viaje.objects.select_related('vendedor')
+        .annotate(volumen_ventas=Sum('pago_cliente_monto'))
+        .annotate(ganancia_usd=Sum('ganancia_usd_vendedor'))
+        .values('vendedor__nombre', 'volumen_ventas', 'ganancia_usd')
+        .order_by('-volumen_ventas')
+    )
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # Realiza las consultas necesarias para obtener la información requerida
-        vendedores = (
-            Viaje.objects.select_related('vendedor')
-            .annotate(volumen_ventas=Sum('pago_cliente_monto'))
-            .annotate(ganancia_usd=Sum('ganancia_usd_vendedor'))
-            .values('vendedor__nombre', 'volumen_ventas', 'ganancia_usd')
-            .order_by('-volumen_ventas')
-        )
-
-        # Agrega el puesto a cada vendedor
-        for i, vendedor in enumerate(vendedores, start=1):
-            vendedor['puesto'] = i
-
-        context['vendedores'] = vendedores
-        return context
-
-from django.views import View
+    # Agrega el puesto a cada vendedor
+    for i, vendedor in enumerate(vendedores, start=1):
+        vendedor['puesto'] = i
+    
+    return vendedores
 
 class TablasCombinadasView(View):
     def get(self, request):
         proveedores_info = pago_proveedor(request)
+        vendedores = vendedores_reporte(request)
+        saldo_por_pago, start_date, end_date = obtener_balance(request)
 
-        # Obtener la información requerida para la tabla de vendedores
-        vendedores = (
-            Viaje.objects.select_related('vendedor')
-            .annotate(volumen_ventas=Sum('pago_cliente_monto'))
-            .annotate(ganancia_usd=Sum('ganancia_usd_vendedor'))
-            .values('vendedor__nombre', 'volumen_ventas', 'ganancia_usd')
-            .order_by('-volumen_ventas')
-        )
-
-        # Agrega el puesto a cada vendedor
-        for i, vendedor in enumerate(vendedores, start=1):
-            vendedor['puesto'] = i
-
-        return render(request, 'tablas_combinadas.html', {'proveedores_info': proveedores_info, 'vendedores': vendedores})
-
-
-
+        return render(request, 'tablas_combinadas.html', {
+            'proveedores_info': proveedores_info, 
+            'vendedores': vendedores,
+            'saldo_por_pago': saldo_por_pago,
+            'start_date': start_date,
+            'end_date': end_date
+            })
 
 
 
