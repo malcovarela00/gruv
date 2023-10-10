@@ -1,7 +1,7 @@
 from django.utils import timezone
 from django.db import models
 from django.core.validators import MinValueValidator
-from .choices import OPCIONES_DE_PAGO, ESTADO, OPCIONES_DE_MODEDA
+from .choices import OPCIONES_DE_PAGO, ESTADO, OPCIONES_DE_MODEDA, OPCIONES_DE_TRANSFERENCIA, OPCIONES_DE_TIPO_CUOTA
 
 
 class Pais(models.Model):
@@ -94,7 +94,7 @@ class Viaje(models.Model):
     ganancia_gruv = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
     ganancia_neta_porc = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
 
-    fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
+    fecha_creacion = models.DateField() #default=timezone.now, editable=False
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -121,10 +121,10 @@ class Viaje(models.Model):
 
 
 class Transferencia(models.Model):
-    sale = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
-    sale_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    entra = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
-    entra_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    salida = models.CharField(max_length=13, choices=OPCIONES_DE_TRANSFERENCIA)
+    salida_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    entrada = models.CharField(max_length=13, choices=OPCIONES_DE_TRANSFERENCIA)
+    entrada_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     observacion = models.CharField(max_length=300, blank=True, null=True, verbose_name='Observación')
     
     fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
@@ -157,10 +157,11 @@ class Plan(models.Model):
 
 class Cuota(models.Model):
     plan = models.ForeignKey('Plan', on_delete=models.CASCADE)
-    tipo_cuota = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
+    tipo_cuota = models.CharField(max_length=13, choices=OPCIONES_DE_TIPO_CUOTA)
     monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     numero_cuota = models.PositiveSmallIntegerField(verbose_name='Número de Cuota')
     saldo = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    pagado = models.BooleanField(default=False)
 
     fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
     update = models.DateTimeField(auto_now=True)

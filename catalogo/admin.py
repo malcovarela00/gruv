@@ -55,18 +55,18 @@ class ViajeAdmin(admin.ModelAdmin):
     list_display = ('cliente', 'producto', 'localizador', 'fecha_viaje', 'pago_cliente_monto', 'vendedor')
     fields = [('cliente', 'pax'), ('producto', 'localizador'), ('fecha_viaje', 'fecha_vuelta'), 
               ('vendedor', 'comision_vendedor'), ('pago_cliente_monto', 'pago_cliente_estado', 'pago_cliente_fecha_vencimiento'),
-              ('proveedor', 'pago_proveedor_estado', 'pago_proveedor_precio'), 'pago_proveedor_fecha_vencimiento',]
+              ('proveedor', 'pago_proveedor_estado', 'pago_proveedor_precio', 'pago_proveedor_fecha_vencimiento', 'fecha_creacion')]
     search_fields = ('cliente__nombre', 'cliente__apellido', 'producto', 'localizador')
     list_filter = ('fecha_viaje', 'proveedor__nombre', 'pax', 'proveedor', 'update')
-    readonly_fields = ('update', 'fecha_creacion')
+    readonly_fields = ('update', ) #'fecha_creacion'
 
 
 @admin.register(Transferencia)
 class TransferenciaAdmin(admin.ModelAdmin):
-    list_display = ('sale', 'sale_monto', 'entra', 'entra_monto')
-    fields = [('sale', 'sale_monto'), ('entra', 'entra_monto'), 'observacion']
-    search_fields = ('sale', 'entra', 'observacion')
-    list_filter = ('sale_monto', 'entra_monto')
+    list_display = ('salida', 'salida_monto', 'entrada', 'entrada_monto')
+    fields = [('salida', 'salida_monto'), ('entrada', 'entrada_monto'), 'observacion']
+    search_fields = ('salida', 'entrada', 'observacion')
+    list_filter = ('salida_monto', 'entrada_monto')
     readonly_fields = ('update',)
 
 
@@ -84,6 +84,6 @@ class PlanAdmin(admin.ModelAdmin):
 @admin.register(Cuota)
 class CuotaAdmin(admin.ModelAdmin):
     list_display = ('plan', 'tipo_cuota', 'monto', 'numero_cuota', 'saldo', 'fecha_creacion', 'update')
-    fields = [('plan', 'tipo_cuota'), ('monto', 'numero_cuota'), 'saldo']
+    fields = [('plan', 'tipo_cuota'), ('monto', 'numero_cuota'), ('saldo', 'pagado')]
     list_filter = ('plan__cliente',)
     search_fields = ('plan__cliente__nombre', 'plan__cliente__apellido')

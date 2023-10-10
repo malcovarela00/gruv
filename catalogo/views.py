@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Viaje, Proveedor, OPCIONES_DE_PAGO
+from .models import Viaje, Transferencia, Proveedor, OPCIONES_DE_PAGO
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views import View
 
@@ -41,8 +41,10 @@ def obtener_balance(request):
 
     # Filtrar los pagos de clientes y proveedores por rango de fechas
         viajes = Viaje.objects.filter(fecha_creacion__gte=start_datetime, fecha_creacion__lte=end_datetime)
+        transferencias = Transferencia.objects.filter(fecha_creacion__gte=start_datetime, fecha_creacion__lte=end_datetime)
     else:
         viajes = Viaje.objects.all()
+        transferencias = Transferencia.objects.all()
 
     # Calcular la suma de las entradas por opciones de pago del cliente
     entradas_por_pago_cliente = viajes.annotate(
