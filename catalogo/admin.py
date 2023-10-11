@@ -55,10 +55,11 @@ class ViajeAdmin(admin.ModelAdmin):
     list_display = ('cliente', 'producto', 'localizador', 'fecha_viaje', 'pago_cliente_monto', 'vendedor')
     fields = [('cliente', 'pax'), ('producto', 'localizador'), ('fecha_viaje', 'fecha_vuelta'), 
               ('vendedor', 'comision_vendedor'), ('pago_cliente_monto', 'pago_cliente_estado', 'pago_cliente_fecha_vencimiento'),
-              ('proveedor', 'pago_proveedor_estado', 'pago_proveedor_precio', 'pago_proveedor_fecha_vencimiento', 'fecha_creacion')]
+              ('proveedor', 'pago_proveedor_estado', 'pago_proveedor_precio', 'pago_proveedor_fecha_vencimiento', 'fecha_creacion'),
+              ('ganancia_bruto', 'ganancia_usd_vendedor', 'ganancia_gruv', 'ganancia_neta_porc')]
     search_fields = ('cliente__nombre', 'cliente__apellido', 'producto', 'localizador')
     list_filter = ('fecha_viaje', 'proveedor__nombre', 'pax', 'proveedor', 'update')
-    readonly_fields = ('update', ) #'fecha_creacion'
+    readonly_fields = ('update', 'ganancia_bruto', 'ganancia_usd_vendedor', 'ganancia_gruv', 'ganancia_neta_porc') #'fecha_creacion'
 
 
 @admin.register(Transferencia)
@@ -78,12 +79,13 @@ class CuotaInline(admin.TabularInline):
 class PlanAdmin(admin.ModelAdmin):
     list_display = ('cliente', 'monto_financiado', 'cantidad_cuotas', 'monto_por_cuota', 'fecha_creacion')
     fields = ['cliente', ('monto_financiado', 'cantidad_cuotas', 'monto_por_cuota')]
+    list_filter = ('fecha_creacion', 'cantidad_cuotas')
     search_fields = ('cliente__nombre', 'cliente__apellido')
     inlines = [CuotaInline]
 
 @admin.register(Cuota)
 class CuotaAdmin(admin.ModelAdmin):
     list_display = ('plan', 'tipo_cuota', 'monto', 'numero_cuota', 'saldo', 'fecha_creacion', 'update')
-    fields = [('plan', 'tipo_cuota'), ('monto', 'numero_cuota'), ('saldo', 'pagado')]
-    list_filter = ('plan__cliente',)
+    fields = [('plan', 'tipo_cuota'), ('monto', 'numero_cuota', 'saldo'), 'pagado']
+    list_filter = ('pagado', 'numero_cuota',)
     search_fields = ('plan__cliente__nombre', 'plan__cliente__apellido')
