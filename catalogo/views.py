@@ -97,19 +97,16 @@ def pago_proveedor(request):
     return proveedores_info
 
 
-def vendedores_reporte(self, **kwargs):
-    vendedores = (
-        Viaje.objects.select_related('vendedor')
-        .annotate(volumen_ventas=Sum('pago_cliente_monto'))
-        .annotate(ganancia_usd=Sum('ganancia_usd_vendedor'))
-        .values('vendedor__nombre', 'volumen_ventas', 'ganancia_usd')
-        .order_by('-volumen_ventas')
-    )
+def vendedores_reporte(request):
+    vendedores_query = Viaje.objects.values('vendedor__nombre').annotate(
+        volumen_ventas=Sum('pago_cliente_monto'),
+        ganancia_usd=Sum('ganancia_usd_vendedor')
+    ).order_by('-volumen_ventas')
 
-    # Agrega el puesto a cada vendedor
+    vendedores = list(vendedores_query)
     for i, vendedor in enumerate(vendedores, start=1):
         vendedor['puesto'] = i
-    
+
     return vendedores
 
 class TablasCombinadasView(View):

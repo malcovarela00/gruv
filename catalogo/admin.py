@@ -1,9 +1,18 @@
 from django.contrib import admin
-from .models import Pais, Proveedor, Vendedor, Cliente, Viaje, Transferencia, Cuota, Plan
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
-
+from .models import (
+    Pais, 
+    Proveedor, 
+    Vendedor, 
+    Cliente, 
+    Viaje, 
+    Transferencia, 
+    Cuota, 
+    PagoProveedor, 
+    Plan,
+)
 
 
 class MyUserAdmin(UserAdmin):
@@ -65,15 +74,23 @@ class ViajeAdmin(admin.ModelAdmin):
 @admin.register(Transferencia)
 class TransferenciaAdmin(admin.ModelAdmin):
     list_display = ('salida', 'salida_monto', 'entrada', 'entrada_monto')
-    fields = [('salida', 'salida_monto'), ('entrada', 'entrada_monto'), 'observacion']
+    fields = [('salida', 'salida_monto'), ('entrada', 'entrada_monto'), ('observacion', 'fecha_creacion')]
     search_fields = ('salida', 'entrada', 'observacion')
     list_filter = ('salida_monto', 'entrada_monto')
     readonly_fields = ('update',)
 
 
+@admin.register(PagoProveedor)
+class PagoProveedorAdmin(admin.ModelAdmin):
+    list_display = ('proveedor', 'tipo_pago', 'monto')
+    fields = ['proveedor', ('tipo_pago', 'monto',), ('observacion', 'fecha_creacion')]
+    search_fields = ('proveedor__nombre', 'tipo_pago')
+    list_filter = ('proveedor', 'fecha_creacion')
+    readonly_fields = ('update',)
+
 class CuotaInline(admin.TabularInline):
     model = Cuota
-    extra = 1
+    extra = 0
 
 @admin.register(Plan)
 class PlanAdmin(admin.ModelAdmin):

@@ -1,7 +1,14 @@
 from django.utils import timezone
 from django.db import models
 from django.core.validators import MinValueValidator
-from .choices import OPCIONES_DE_PAGO, ESTADO, OPCIONES_DE_MODEDA, OPCIONES_DE_TRANSFERENCIA, OPCIONES_DE_TIPO_CUOTA
+from .choices import (
+    OPCIONES_DE_PAGO,
+    ESTADO,
+    OPCIONES_DE_MODEDA,
+    OPCIONES_DE_TRANSFERENCIA,
+    OPCIONES_DE_TIPO_CUOTA,
+    OPCIONES_TIPO_PAGO_PROVEEDOR
+)
 
 
 class Pais(models.Model):
@@ -116,7 +123,7 @@ class Transferencia(models.Model):
     entrada_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     observacion = models.TextField(blank=True,  null=True, verbose_name='Observación')
     
-    fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
+    fecha_creacion = models.DateField() #default=timezone.now, editable=False
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -124,6 +131,24 @@ class Transferencia(models.Model):
 
     class Meta:
         ordering = ['-update']
+
+
+class PagoProveedor(models.Model):
+    proveedor = models.ForeignKey('Proveedor', on_delete=models.CASCADE)
+    tipo_pago = models.CharField(max_length=13, choices=OPCIONES_TIPO_PAGO_PROVEEDOR, verbose_name='Tipo de Pago')
+    monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    observacion = models.TextField(blank=True,  null=True, verbose_name='Observación')
+
+    fecha_creacion = models.DateField() #default=timezone.now, editable=False
+    update = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.proveedor) + ' - ' + str(self.monto)
+
+    class Meta:
+        ordering = ['-update']
+        verbose_name = 'Pago Proveedor'
+        verbose_name_plural = 'Pago Proveedores'
 
 
 class Plan(models.Model):

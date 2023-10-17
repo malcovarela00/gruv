@@ -17,8 +17,8 @@
                 <tr>
                     <td>{{ vendedor.puesto }}</td>
                     <td>{{ vendedor.vendedor__nombre }}</td>
-                    <td>{{ vendedor.volumen_ventas }}</td>
-                    <td>{{ vendedor.ganancia_usd }}</td>
+                    <td>{{ vendedor.volumen_ventas|floatformat:2 }}</td>
+                    <td>{{ vendedor.ganancia_usd|floatformat:2 }}</td>
                 </tr>
             {% endfor %}
         </tbody>
@@ -51,8 +51,6 @@
         <thead>
             <tr>
                 <th>Opción de Pago</th>
-                <th>Entrada</th>
-                <th>Salida</th>
                 <th>Saldo</th>
             </tr>
         </thead>
@@ -60,8 +58,6 @@
             {% for opcion, entrada, salida, saldo in saldo_por_pago %}
             <tr>
                 <td>{{ opcion }}</td>
-                <td>{{ entrada|floatformat:2 }}</td>
-                <td>{{ salida|floatformat:2 }}</td>
                 <td>{{ saldo|floatformat:2 }}</td>
             </tr>
             {% endfor %}
