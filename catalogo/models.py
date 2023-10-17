@@ -1,7 +1,14 @@
 from django.utils import timezone
 from django.db import models
 from django.core.validators import MinValueValidator
-from .choices import OPCIONES_DE_PAGO, ESTADO, OPCIONES_DE_MODEDA
+from .choices import (
+    OPCIONES_DE_PAGO,
+    ESTADO,
+    OPCIONES_DE_MODEDA,
+    OPCIONES_DE_TRANSFERENCIA,
+    OPCIONES_DE_TIPO_CUOTA,
+    OPCIONES_TIPO_PAGO_PROVEEDOR
+)
 
 
 class Pais(models.Model):
@@ -89,45 +96,34 @@ class Viaje(models.Model):
 
     pago_proveedor = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     
-    ganancia_bruto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
-    ganancia_usd_vendedor = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
-    ganancia_gruv = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
-    ganancia_neta_porc = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
+    ganancia_bruto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00,)
+    ganancia_usd_vendedor = models.DecimalField(max_digits=10, decimal_places=2, default=0.00,)
+    ganancia_gruv = models.DecimalField(max_digits=10, decimal_places=2, default=0.00,)
+    ganancia_neta_porc = models.DecimalField(max_digits=10, decimal_places=2, default=0.00,)
 
-    fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
+    fecha_creacion = models.DateField() #default=timezone.now, editable=False
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f'{self.cliente} - {self.producto}'
 
     def save(self, *args, **kwargs):
-        if self.pago_cliente_estado in ['santander', 'bbva', 'cta-cc €']:
-            self.pago_cliente_moneda = 'euro'
-        else:
-            self.pago_cliente_moneda = 'dolar'
+        from catalogo.save import custom_save
 
-        self.pago_proveedor = round(self.pago_proveedor_precio - (self.pago_proveedor_precio * (self.proveedor.comision / 100)), 2)
-        self.ganancia_bruto = self.pago_cliente_monto - self.pago_proveedor
-        self.ganancia_usd_vendedor = round(self.pago_cliente_monto * (self.comision_vendedor / 100), 2)
-        self.ganancia_gruv = self.ganancia_bruto - self.ganancia_usd_vendedor
-        self.ganancia_neta_porc = round((self.ganancia_gruv * 100) / self.ganancia_bruto, 2) if self.ganancia_bruto != 0 else 0
-
-        self.pago_proveedor_moneda = 'dolar'
-
-        super().save(*args, **kwargs)
+        custom_save(self, *args, **kwargs)
 
     class Meta:
         ordering = ['-update']
 
 
 class Transferencia(models.Model):
-    sale = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
-    sale_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    entra = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
-    entra_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    observacion = models.CharField(max_length=300, blank=True, null=True, verbose_name='Observación')
+    salida = models.CharField(max_length=13, choices=OPCIONES_DE_TRANSFERENCIA)
+    salida_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    entrada = models.CharField(max_length=13, choices=OPCIONES_DE_TRANSFERENCIA)
+    entrada_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    observacion = models.TextField(blank=True,  null=True, verbose_name='Observación')
     
-    fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
+    fecha_creacion = models.DateField() #default=timezone.now, editable=False
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -135,6 +131,24 @@ class Transferencia(models.Model):
 
     class Meta:
         ordering = ['-update']
+
+
+class PagoProveedor(models.Model):
+    proveedor = models.ForeignKey('Proveedor', on_delete=models.CASCADE)
+    tipo_pago = models.CharField(max_length=13, choices=OPCIONES_TIPO_PAGO_PROVEEDOR, verbose_name='Tipo de Pago')
+    monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    observacion = models.TextField(blank=True,  null=True, verbose_name='Observación')
+
+    fecha_creacion = models.DateField() #default=timezone.now, editable=False
+    update = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return str(self.proveedor) + ' - ' + str(self.monto)
+
+    class Meta:
+        ordering = ['-update']
+        verbose_name = 'Pago Proveedor'
+        verbose_name_plural = 'Pago Proveedores'
 
 
 class Plan(models.Model):
@@ -147,7 +161,7 @@ class Plan(models.Model):
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.cliente + self.monto_financiado
+        return str(self.cliente) + ' - ' + str(self.monto_financiado)
 
     class Meta:
         ordering = ['-update']
@@ -157,16 +171,17 @@ class Plan(models.Model):
 
 class Cuota(models.Model):
     plan = models.ForeignKey('Plan', on_delete=models.CASCADE)
-    tipo_cuota = models.CharField(max_length=13, choices=OPCIONES_DE_PAGO)
+    tipo_cuota = models.CharField(max_length=13, choices=OPCIONES_DE_TIPO_CUOTA)
     monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     numero_cuota = models.PositiveSmallIntegerField(verbose_name='Número de Cuota')
     saldo = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    pagado = models.BooleanField(default=False)
 
     fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.plan + self.numero_cuota
+        return str(self.plan) + ' - ' + str(self.numero_cuota)
 
     class Meta:
-        ordering = ['-update']
+        ordering = ['-numero_cuota']
