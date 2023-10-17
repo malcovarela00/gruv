@@ -127,7 +127,7 @@ class Transferencia(models.Model):
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.sale
+        return str(self.salida) + ' - ' + str(self.salida_monto)
 
     class Meta:
         ordering = ['-update']
