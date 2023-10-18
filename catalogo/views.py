@@ -46,30 +46,6 @@ def obtener_balance(request):
         viajes = Viaje.objects.all()
         transferencias = Transferencia.objects.all()
 
-    # Calcular la suma de las entradas por opciones de pago del cliente
-    entradas_por_pago_cliente = viajes.annotate(
-        entrada=Case(
-            *[When(pago_cliente_estado=opcion, then=F('pago_cliente_monto')) for opcion, _ in OPCIONES_DE_PAGO],
-            default=0, output_field=DecimalField(max_digits=12, decimal_places=2)
-        )
-    ).values('pago_cliente_estado').annotate(total_entrada=Sum('entrada'))
-
-    # Calcular la suma de las salidas por opciones de pago del proveedor
-    salidas_por_pago_proveedor = viajes.annotate(
-        salida=Case(
-            *[When(pago_cliente_estado=opcion, then=F('pago_proveedor_precio')) for opcion, _ in OPCIONES_DE_PAGO],
-            default=0,
-            output_field=DecimalField(max_digits=12, decimal_places=2)
-        )
-    ).values('pago_proveedor_estado').annotate(total_salida=Sum('salida'))
-
-    # Combinar la información de entrada y salida por opción de pago
-    saldo_por_pago = []
-    for opcion, _ in OPCIONES_DE_PAGO:
-        entrada = next((item['total_entrada'] for item in entradas_por_pago_cliente if item['pago_cliente_estado'] == opcion), 0)
-        salida = next((item['total_salida'] for item in salidas_por_pago_proveedor if item['pago_proveedor_estado'] == opcion), 0)
-        saldo = entrada - salida
-        saldo_por_pago.append((opcion.upper(), entrada, salida, saldo))
 
     return saldo_por_pago, start_date, end_date
 
@@ -77,22 +53,7 @@ def obtener_balance(request):
 def pago_proveedor(request):
     # Obtener la información requerida para la tabla
     proveedores_info = Viaje.objects.values('proveedor__pais__nombre').annotate(
-        saldo=Sum('pago_proveedor_precio', default=0,),
-        pendiente=Sum(
-            Case(
-                When(pago_proveedor_estado='pendiente', then=F('pago_proveedor_precio')),
-                default=0,
-                output_field=DecimalField(max_digits=12, decimal_places=2)
-            )
-        ),
-        pago_en_destino=Sum(
-            Case(
-                When(pago_proveedor_estado='pago destino', then=F('pago_proveedor_precio')),
-                default=0,
-                output_field=DecimalField(max_digits=12, decimal_places=2)
-            )
-        ),
-    )
+        saldo=Sum('pago_proveedor_precio', default=0,),)
 
     return proveedores_info
 

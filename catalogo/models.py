@@ -3,7 +3,6 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from .choices import (
     OPCIONES_DE_PAGO,
-    ESTADO,
     OPCIONES_DE_MODEDA,
     OPCIONES_DE_TRANSFERENCIA,
     OPCIONES_DE_TIPO_CUOTA,
@@ -26,7 +25,7 @@ class Pais(models.Model):
 
 class Proveedor(models.Model):
     nombre = models.CharField(max_length=100)
-    comision = models.DecimalField(max_digits=4, decimal_places=2, default=1.00)
+    comision = models.DecimalField(max_digits=4, decimal_places=2, default=1.00, verbose_name='Comision (%)')
     pais = models.ForeignKey('Pais', on_delete=models.CASCADE)
     update = models.DateTimeField(auto_now=True)
 
@@ -89,7 +88,6 @@ class Viaje(models.Model):
     pago_cliente_fecha_vencimiento = models.DateField()
 
     proveedor = models.ForeignKey('Proveedor', on_delete=models.CASCADE)
-    pago_proveedor_estado = models.CharField(max_length=10, choices=ESTADO)
     pago_proveedor_precio = models.DecimalField(max_digits=10, decimal_places=2)
     pago_proveedor_moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA, editable=False)
     pago_proveedor_fecha_vencimiento = models.DateField(verbose_name='Fecha de Entrada en Gastos')
@@ -108,9 +106,20 @@ class Viaje(models.Model):
         return f'{self.cliente} - {self.producto}'
 
     def save(self, *args, **kwargs):
-        from catalogo.save import custom_save
+        if self.pago_cliente_estado in ['santander', 'bbva', 'cta-cc €']:
+            self.pago_cliente_moneda = 'euro'
+        else:
+            self.pago_cliente_moneda = 'dolar'
 
-        custom_save(self, *args, **kwargs)
+        self.pago_proveedor = round(self.pago_proveedor_precio - (self.pago_proveedor_precio * (self.proveedor.comision / 100)), 2)
+        self.ganancia_bruto = self.pago_cliente_monto - self.pago_proveedor
+        self.ganancia_usd_vendedor = round(self.pago_cliente_monto * (self.comision_vendedor / 100), 2)
+        self.ganancia_gruv = self.ganancia_bruto - self.ganancia_usd_vendedor
+        self.ganancia_neta_porc = round((self.ganancia_gruv * 100) / self.ganancia_bruto, 2) if self.ganancia_bruto != 0 else 0
+
+        self.pago_proveedor_moneda = 'dolar'
+
+        super(Viaje, self).save(*args, **kwargs)
 
     class Meta:
         ordering = ['-update']
@@ -134,7 +143,7 @@ class Transferencia(models.Model):
 
 
 class PagoProveedor(models.Model):
-    proveedor = models.ForeignKey('Proveedor', on_delete=models.CASCADE)
+    pais = models.ForeignKey('Pais', on_delete=models.CASCADE)
     tipo_pago = models.CharField(max_length=13, choices=OPCIONES_TIPO_PAGO_PROVEEDOR, verbose_name='Tipo de Pago')
     monto = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     observacion = models.TextField(blank=True,  null=True, verbose_name='Observación')
@@ -143,7 +152,7 @@ class PagoProveedor(models.Model):
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return str(self.proveedor) + ' - ' + str(self.monto)
+        return str(self.pais) + ' - ' + str(self.monto)
 
     class Meta:
         ordering = ['-update']
@@ -176,6 +185,7 @@ class Cuota(models.Model):
     numero_cuota = models.PositiveSmallIntegerField(verbose_name='Número de Cuota')
     saldo = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     pagado = models.BooleanField(default=False)
+    fecha_vencimiento = models.DateField(verbose_name='Fecha de Vencimiento')
 
     fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
     update = models.DateTimeField(auto_now=True)
@@ -184,4 +194,15 @@ class Cuota(models.Model):
         return str(self.plan) + ' - ' + str(self.numero_cuota)
 
     class Meta:
-        ordering = ['-numero_cuota']
+        ordering = ['numero_cuota']
+
+
+# class Balance(models.Model):
+#     entrada = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+#     billetera = 
+#     razon_entrada = models.CharField(max_length=100, blank=True, null=True)
+#     salida = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+#     razon_salida = models.CharField(max_length=100, blank=True, null=True)
+
+#     def __str__(self):
+#         return 

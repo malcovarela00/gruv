@@ -64,11 +64,11 @@ class ViajeAdmin(admin.ModelAdmin):
     list_display = ('cliente', 'producto', 'localizador', 'fecha_viaje', 'pago_cliente_monto', 'vendedor')
     fields = [('cliente', 'pax'), ('producto', 'localizador'), ('fecha_viaje', 'fecha_vuelta'), 
               ('vendedor', 'comision_vendedor'), ('pago_cliente_monto', 'pago_cliente_estado', 'pago_cliente_fecha_vencimiento'),
-              ('proveedor', 'pago_proveedor_estado', 'pago_proveedor_precio', 'pago_proveedor_fecha_vencimiento', 'fecha_creacion'),
-              ('ganancia_bruto', 'ganancia_usd_vendedor', 'ganancia_gruv', 'ganancia_neta_porc')]
+              ('proveedor', 'pago_proveedor_precio', 'pago_proveedor_fecha_vencimiento', 'fecha_creacion'),
+              ('pago_proveedor', 'ganancia_bruto', 'ganancia_usd_vendedor', 'ganancia_gruv', 'ganancia_neta_porc')]
     search_fields = ('cliente__nombre', 'cliente__apellido', 'producto', 'localizador')
     list_filter = ('fecha_viaje', 'proveedor__nombre', 'pax', 'proveedor', 'update')
-    readonly_fields = ('update', 'ganancia_bruto', 'ganancia_usd_vendedor', 'ganancia_gruv', 'ganancia_neta_porc') #'fecha_creacion'
+    readonly_fields = ('update', 'pago_proveedor','ganancia_bruto', 'ganancia_usd_vendedor', 'ganancia_gruv', 'ganancia_neta_porc') #'fecha_creacion'
 
 
 @admin.register(Transferencia)
@@ -82,10 +82,10 @@ class TransferenciaAdmin(admin.ModelAdmin):
 
 @admin.register(PagoProveedor)
 class PagoProveedorAdmin(admin.ModelAdmin):
-    list_display = ('proveedor', 'tipo_pago', 'monto')
-    fields = ['proveedor', ('tipo_pago', 'monto',), ('observacion', 'fecha_creacion')]
-    search_fields = ('proveedor__nombre', 'tipo_pago')
-    list_filter = ('proveedor', 'fecha_creacion')
+    list_display = ('pais', 'tipo_pago', 'monto')
+    fields = ['pais', ('tipo_pago', 'monto',), ('observacion', 'fecha_creacion')]
+    search_fields = ('pais__nombre', 'tipo_pago')
+    list_filter = ('pais', 'fecha_creacion')
     readonly_fields = ('update',)
 
 class CuotaInline(admin.TabularInline):
@@ -102,7 +102,7 @@ class PlanAdmin(admin.ModelAdmin):
 
 @admin.register(Cuota)
 class CuotaAdmin(admin.ModelAdmin):
-    list_display = ('plan', 'tipo_cuota', 'monto', 'numero_cuota', 'saldo', 'fecha_creacion', 'update')
-    fields = [('plan', 'tipo_cuota'), ('monto', 'numero_cuota', 'saldo'), 'pagado']
+    list_display = ('plan', 'tipo_cuota', 'monto', 'numero_cuota', 'saldo', 'fecha_creacion', 'pagado')
+    fields = [('plan', 'tipo_cuota'), ('monto', 'numero_cuota', 'saldo','fecha_vencimiento'), 'pagado']
     list_filter = ('pagado', 'numero_cuota',)
     search_fields = ('plan__cliente__nombre', 'plan__cliente__apellido')

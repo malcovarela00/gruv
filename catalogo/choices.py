@@ -12,20 +12,23 @@ OPCIONES_DE_PAGO = [
 ]
 
 OPCIONES_DE_TIPO_CUOTA = [
-    ('cta-cc €', 'Cuenta Corriente (CTA-CC €)'),
-    ('cta-cc usd', 'Cuenta Corriente (CTA-CC USD)'),
+    ('wise', 'WISE'),
+    ('santander', 'SANTANDER'),
+    ('bbva', 'BBVA'),
+    ('usdt', 'USDT'),
+    ('pendiente', 'Pendiente'),
 ]
 
 OPCIONES_TIPO_PAGO_PROVEEDOR = [
     ('wise', 'WISE'),
     ('usdt', 'USDT'),
     ('santander', 'SANTANDER'),
+    ('cash', 'CASH'),
 ]
 
 OPCIONES_DE_TRANSFERENCIA = [
     ('wise', 'WISE'),
     ('santander', 'SANTANDER'),
-    ('bbva', 'BBVA'),
     ('usdt', 'USDT'),
     ('cash', 'CASH'),
 ]
@@ -33,8 +36,3 @@ OPCIONES_DE_TRANSFERENCIA = [
 OPCIONES_DE_MODEDA = [
     ('euro', '€ (euro)'),
     ('dolar', '$ (dolar)')]
-
-ESTADO = [
-    ('pendiente', 'Pendiente'),
-    ('confirmado', 'Confirmado'),
-]
