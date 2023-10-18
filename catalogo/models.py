@@ -193,4 +193,4 @@ class Balance(models.Model):
     fecha = models.DateField()
 
     def __str__(self):
-        return f'{self.billetera} - {self.monto}'
+        return f'{self.billetera} - {self.movimiento} - {self.tipo_movimiento} - {self.razon} - {self.monto}'
