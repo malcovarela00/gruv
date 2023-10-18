@@ -3,15 +3,15 @@ from django.contrib.auth.admin import UserAdmin
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth.models import User
 from .models import (
-    Pais, 
-    Proveedor, 
-    Vendedor, 
-    Cliente, 
-    Viaje, 
-    Transferencia, 
-    Cuota, 
-    PagoProveedor, 
+    Pais,
+    Proveedor,
+    Vendedor,
+    Viaje,
+    Transferencia,
+    Cuota,
+    PagoProveedor,
     Plan,
+    Balance,
 )
 
 
@@ -50,15 +50,6 @@ class VendedorAdmin(admin.ModelAdmin):
     readonly_fields = ('update',)
 
 
-@admin.register(Cliente)
-class ClienteAdmin(admin.ModelAdmin):
-    list_display = ('nombre', 'apellido', 'email', 'telefono')
-    fields = [('nombre', 'apellido'), ('telefono', 'email')]
-    search_fields = ('nombre', 'apellido', 'email', 'telefono')
-    list_filter = ('pais', 'update')
-    readonly_fields = ('update',)
-
-
 @admin.register(Viaje)
 class ViajeAdmin(admin.ModelAdmin):
     list_display = ('cliente', 'producto', 'localizador', 'fecha_viaje', 'pago_cliente_monto', 'vendedor')
@@ -67,7 +58,7 @@ class ViajeAdmin(admin.ModelAdmin):
               ('proveedor', 'pago_proveedor_precio', 'pago_proveedor_fecha_vencimiento', 'fecha_creacion'),
               ('pago_proveedor', 'ganancia_bruto', 'ganancia_usd_vendedor', 'ganancia_gruv', 'ganancia_neta_porc')]
     search_fields = ('cliente__nombre', 'cliente__apellido', 'producto', 'localizador')
-    list_filter = ('fecha_viaje', 'proveedor__nombre', 'pax', 'proveedor', 'update')
+    list_filter = ('fecha_viaje', 'pax', 'proveedor', 'pago_cliente_estado', 'fecha_creacion')
     readonly_fields = ('update', 'pago_proveedor','ganancia_bruto', 'ganancia_usd_vendedor', 'ganancia_gruv', 'ganancia_neta_porc') #'fecha_creacion'
 
 
@@ -106,3 +97,11 @@ class CuotaAdmin(admin.ModelAdmin):
     fields = [('plan', 'tipo_cuota'), ('monto', 'numero_cuota', 'saldo','fecha_vencimiento'), 'pagado']
     list_filter = ('pagado', 'numero_cuota',)
     search_fields = ('plan__cliente__nombre', 'plan__cliente__apellido')
+
+
+@admin.register(Balance)
+class BalanceAdmin(admin.ModelAdmin):
+    list_display = ('billetera', 'movimiento', 'tipo_movimiento', 'razon', 'monto', 'fecha')
+    fields = [('billetera', 'movimiento'), ('tipo_movimiento', 'razon', 'monto','fecha')]
+    list_filter = ('billetera', 'movimiento', 'fecha')
+    search_fields = ('billetera', 'movimiento', 'tipo_movimiento')

@@ -6,7 +6,9 @@ from .choices import (
     OPCIONES_DE_MODEDA,
     OPCIONES_DE_TRANSFERENCIA,
     OPCIONES_DE_TIPO_CUOTA,
-    OPCIONES_TIPO_PAGO_PROVEEDOR
+    OPCIONES_TIPO_PAGO_PROVEEDOR,
+    OPCIONES_MOVIMIENTO,
+    TIPO_DE_MOVIMIENTO
 )
 
 
@@ -56,23 +58,8 @@ class Vendedor(models.Model):
         verbose_name_plural = 'Vendedores'
 
 
-class Cliente(models.Model):
-    nombre = models.CharField(max_length=100)
-    apellido = models.CharField(max_length=100, blank=True, null=True)
-    telefono = models.CharField(max_length=20, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
-    pais = models.ForeignKey('Pais', on_delete=models.CASCADE, blank=True, null=True)
-    update = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.nombre
-
-    class Meta:
-        ordering = ['nombre']
-
-
 class Viaje(models.Model):
-    cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE)
+    cliente = models.CharField(max_length=100)
     producto = models.CharField(max_length=200)
     localizador = models.CharField(max_length=50, unique=True)
     pax = models.PositiveSmallIntegerField(blank=True, null=True)
@@ -161,7 +148,7 @@ class PagoProveedor(models.Model):
 
 
 class Plan(models.Model):
-    cliente = models.ForeignKey('Cliente', on_delete=models.CASCADE)
+    cliente = models.CharField(max_length=100)
     monto_financiado = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name='Monto a Financiar')
     cantidad_cuotas = models.PositiveSmallIntegerField(verbose_name='Cantidad de Cuotas')
     monto_por_cuota = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, verbose_name='Monto por Cuota')
@@ -197,12 +184,13 @@ class Cuota(models.Model):
         ordering = ['numero_cuota']
 
 
-# class Balance(models.Model):
-#     entrada = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-#     billetera = 
-#     razon_entrada = models.CharField(max_length=100, blank=True, null=True)
-#     salida = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-#     razon_salida = models.CharField(max_length=100, blank=True, null=True)
+class Balance(models.Model):
+    billetera = models.CharField(max_length=20, choices=OPCIONES_DE_PAGO)
+    movimiento = models.CharField(max_length=20,choices=OPCIONES_MOVIMIENTO)
+    tipo_movimiento = models.CharField(max_length=100, choices=TIPO_DE_MOVIMIENTO)
+    razon = models.CharField(max_length=100, blank=True, null=True)
+    monto = models.DecimalField(max_digits=10, decimal_places=2)
+    fecha = models.DateField()
 
-#     def __str__(self):
-#         return 
+    def __str__(self):
+        return f'{self.billetera} - {self.monto}'

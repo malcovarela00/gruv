@@ -36,3 +36,15 @@ OPCIONES_DE_TRANSFERENCIA = [
 OPCIONES_DE_MODEDA = [
     ('euro', '€ (euro)'),
     ('dolar', '$ (dolar)')]
+
+OPCIONES_MOVIMIENTO = [
+    ('entrada', 'Entrada'),
+    ('salida', 'Salida')
+]
+
+TIPO_DE_MOVIMIENTO = [
+    ('pago cliente', 'Pago Cliente'),
+    ('pago proveedor', 'Pago Proveedor'),
+    ('cuota', 'Cuota'),
+    ('transferencia', 'Transferencia'),
+]
