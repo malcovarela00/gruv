@@ -108,6 +108,28 @@ class Viaje(models.Model):
 
         super(Viaje, self).save(*args, **kwargs)
 
+        if self.pago_cliente_estado not in ['cta-cc €', 'cta-cc usd']:
+            # Luego busca y actualiza el objeto Balance, o crea uno nuevo si no existe
+            try:
+                balance = Balance.objects.get(viaje=self)
+                balance.billetera = self.pago_cliente_estado
+                balance.movimiento = 'entrada'
+                balance.tipo_movimiento = 'pago cliente'
+                balance.razon = f'{self.cliente} - {self.producto}'
+                balance.monto = self.pago_cliente_monto
+                balance.fecha = self.update
+                balance.save()
+            except Balance.DoesNotExist:
+                Balance.objects.create(
+                    viaje=self,
+                    billetera=self.pago_cliente_estado,
+                    movimiento='entrada',
+                    tipo_movimiento='pago cliente',
+                    razon=f'{self.cliente} - {self.producto}',
+                    monto=self.pago_cliente_monto,
+                    fecha=self.update
+                )
+
     class Meta:
         ordering = ['-update']
 
@@ -125,6 +147,50 @@ class Transferencia(models.Model):
     def __str__(self):
         return str(self.salida) + ' - ' + str(self.salida_monto)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # Guarda el objeto PagoProveedor primero
+
+        # Luego busca y actualiza el objeto Balance, o crea uno nuevo si no existe
+        balances_salida = Balance.objects.filter(transferencia=self, movimiento='salida')
+        for balance_salida in balances_salida:
+            balance_salida.billetera = self.salida
+            balance_salida.tipo_movimiento = 'transferencia'
+            balance_salida.razon = f'Observación: {self.observacion}'
+            balance_salida.monto = self.salida_monto
+            balance_salida.fecha = self.update
+            balance_salida.save()
+
+        # Busca y actualiza los objetos Balance asociados con la entrada de la Transferencia
+        balances_entrada = Balance.objects.filter(transferencia=self, movimiento='entrada')
+        for balance_entrada in balances_entrada:
+            balance_entrada.billetera = self.entrada
+            balance_entrada.tipo_movimiento = 'transferencia'
+            balance_entrada.razon = f'Observación: {self.observacion}'
+            balance_entrada.monto = self.entrada_monto
+            balance_entrada.fecha = self.update
+            balance_entrada.save()
+        # Si no se encontraron objetos Balance, crea nuevos objetos
+        if not balances_salida.exists():
+            Balance.objects.create(
+                transferencia=self,
+                billetera=self.salida,
+                movimiento='salida',
+                tipo_movimiento='transferencia',
+                razon=f'Observación: {self.observacion}',
+                monto=self.salida_monto,
+                fecha=self.update
+            )
+        if not balances_entrada.exists():
+            Balance.objects.create(
+                transferencia=self,
+                billetera=self.entrada,
+                movimiento='entrada',
+                tipo_movimiento='transferencia',
+                razon=f'Observación: {self.observacion}',
+                monto=self.entrada_monto,
+                fecha=self.update
+            )
+
     class Meta:
         ordering = ['-update']
 
@@ -140,6 +206,30 @@ class PagoProveedor(models.Model):
 
     def __str__(self):
         return str(self.pais) + ' - ' + str(self.monto)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # Guarda el objeto PagoProveedor primero
+
+    # Luego busca y actualiza el objeto Balance, o crea uno nuevo si no existe
+        try:
+            balance = Balance.objects.get(pago_proveedor=self)
+            balance.billetera = self.tipo_pago
+            balance.movimiento = 'salida'
+            balance.tipo_movimiento = 'pago proveedor'
+            balance.razon = f'{self.pais}'
+            balance.monto = self.monto
+            balance.fecha = self.update
+            balance.save()
+        except Balance.DoesNotExist:
+            Balance.objects.create(
+                pago_proveedor=self,
+                billetera=self.tipo_pago,
+                movimiento='salida',
+                tipo_movimiento='pago proveedor',
+                razon=f'{self.pais}',
+                monto=self.monto,
+                fecha=self.update
+            )
 
     class Meta:
         ordering = ['-update']
@@ -180,11 +270,41 @@ class Cuota(models.Model):
     def __str__(self):
         return str(self.plan) + ' - ' + str(self.numero_cuota)
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # Guarda el objeto PagoProveedor primero
+
+        # Luego busca y actualiza el objeto Balance, o crea uno nuevo si no existe
+        if self.pagado:
+            try:
+                balance = Balance.objects.get(cuota=self)
+                balance.billetera = self.tipo_cuota
+                balance.movimiento = 'entrada'
+                balance.tipo_movimiento = 'cuota'
+                balance.razon = f'{self.plan} - {self.numero_cuota}'
+                balance.monto = self.monto
+                balance.fecha = self.update
+                balance.save()
+            except Balance.DoesNotExist:
+                Balance.objects.create(
+                    cuota=self,
+                    billetera=self.tipo_cuota,
+                    movimiento='entrada',
+                    tipo_movimiento='cuota',
+                    razon=f'{self.plan} - {self.numero_cuota}',
+                    monto=self.monto,
+                    fecha=self.update
+                )
+
     class Meta:
         ordering = ['numero_cuota']
 
 
 class Balance(models.Model):
+    viaje = models.ForeignKey('Viaje', on_delete=models.CASCADE, blank=True, null=True)
+    transferencia = models.ForeignKey('Transferencia', on_delete=models.CASCADE, blank=True, null=True)
+    pago_proveedor = models.ForeignKey('PagoProveedor', on_delete=models.CASCADE, blank=True, null=True)
+    cuota = models.ForeignKey('Cuota', on_delete=models.CASCADE, blank=True, null=True)
+    
     billetera = models.CharField(max_length=20, choices=OPCIONES_DE_PAGO)
     movimiento = models.CharField(max_length=20,choices=OPCIONES_MOVIMIENTO)
     tipo_movimiento = models.CharField(max_length=100, choices=TIPO_DE_MOVIMIENTO)

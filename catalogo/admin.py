@@ -102,6 +102,6 @@ class CuotaAdmin(admin.ModelAdmin):
 @admin.register(Balance)
 class BalanceAdmin(admin.ModelAdmin):
     list_display = ('billetera', 'movimiento', 'tipo_movimiento', 'razon', 'monto', 'fecha')
-    fields = [('billetera', 'movimiento'), ('tipo_movimiento', 'razon', 'monto','fecha')]
+    fields = [('viaje', 'transferencia', 'pago_proveedor', 'cuota'), ('billetera', 'movimiento'), ('tipo_movimiento', 'razon', 'monto','fecha')]
     list_filter = ('billetera', 'movimiento', 'fecha')
     search_fields = ('billetera', 'movimiento', 'tipo_movimiento')
