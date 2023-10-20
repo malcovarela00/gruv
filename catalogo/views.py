@@ -11,6 +11,13 @@ from django.utils import timezone
 def home(request):
     return render(request, 'home.html')
 
+def index(request):
+    vendedores = vendedores_reporte(request)
+    context = {
+        'segment': 'index',
+        'vendedores': vendedores,
+        }
+    return render(request, "templates_admin_data/pages/index.html", context)
 
 @staff_member_required
 def viaje_list(request):
