@@ -1,5 +1,5 @@
 // Obtener los elementos del formulario
-const pagoProveedor = document.getElementById('id_pago_proveedor_precio');
+const pagoProveedor = document.getElementById('id_pago_proveedor_web');
 const comisionProveedor = document.getElementById('id_proveedor_comision');
 const pagoCliente = document.getElementById('id_pago_cliente_monto');
 const comisionVendedor = document.getElementById('id_comision_vendedor');

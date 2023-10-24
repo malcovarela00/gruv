@@ -75,7 +75,7 @@ class Viaje(models.Model):
     pago_cliente_fecha_vencimiento = models.DateField()
 
     proveedor = models.ForeignKey('Proveedor', on_delete=models.CASCADE)
-    pago_proveedor_precio = models.DecimalField(max_digits=10, decimal_places=2)
+    pago_proveedor_web = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Precio Proveedor WEB ')
     pago_proveedor_moneda = models.CharField(max_length=10, choices=OPCIONES_DE_MODEDA, editable=False)
     pago_proveedor_fecha_vencimiento = models.DateField(verbose_name='Fecha de Entrada en Gastos')
 
@@ -98,7 +98,7 @@ class Viaje(models.Model):
         else:
             self.pago_cliente_moneda = 'dolar'
 
-        self.pago_proveedor = round(self.pago_proveedor_precio - (self.pago_proveedor_precio * (self.proveedor.comision / 100)), 2)
+        self.pago_proveedor = round(self.pago_proveedor_web - (self.pago_proveedor_web * (self.proveedor.comision / 100)), 2)
         self.ganancia_bruto = self.pago_cliente_monto - self.pago_proveedor
         self.ganancia_usd_vendedor = round(self.pago_cliente_monto * (self.comision_vendedor / 100), 2)
         self.ganancia_gruv = self.ganancia_bruto - self.ganancia_usd_vendedor
@@ -108,27 +108,25 @@ class Viaje(models.Model):
 
         super(Viaje, self).save(*args, **kwargs)
 
-        if self.pago_cliente_estado not in ['cta-cc €', 'cta-cc usd']:
-            # Luego busca y actualiza el objeto Balance, o crea uno nuevo si no existe
-            try:
-                balance = Balance.objects.get(viaje=self)
-                balance.billetera = self.pago_cliente_estado
-                balance.movimiento = 'entrada'
-                balance.tipo_movimiento = 'pago cliente'
-                balance.razon = f'{self.cliente} - {self.producto}'
-                balance.monto = self.pago_cliente_monto
-                balance.fecha = self.update
-                balance.save()
-            except Balance.DoesNotExist:
-                Balance.objects.create(
-                    viaje=self,
-                    billetera=self.pago_cliente_estado,
-                    movimiento='entrada',
-                    tipo_movimiento='pago cliente',
-                    razon=f'{self.cliente} - {self.producto}',
-                    monto=self.pago_cliente_monto,
-                    fecha=self.update
-                )
+        try:
+            balance = Balance.objects.get(viaje=self)
+            balance.billetera = self.pago_cliente_estado
+            balance.movimiento = 'entrada'
+            balance.tipo_movimiento = 'pago cliente'
+            balance.razon = f'{self.cliente} - {self.producto}'
+            balance.monto = self.pago_cliente_monto
+            balance.fecha = self.update
+            balance.save()
+        except Balance.DoesNotExist:
+            Balance.objects.create(
+                viaje=self,
+                billetera=self.pago_cliente_estado,
+                movimiento='entrada',
+                tipo_movimiento='pago cliente',
+                razon=f'{self.cliente} - {self.producto}',
+                monto=self.pago_cliente_monto,
+                fecha=self.update
+            )
 
     class Meta:
         ordering = ['-update']
@@ -148,7 +146,7 @@ class Transferencia(models.Model):
         return str(self.salida) + ' - ' + str(self.salida_monto)
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  # Guarda el objeto PagoProveedor primero
+        super().save(*args, **kwargs)
 
         # Luego busca y actualiza el objeto Balance, o crea uno nuevo si no existe
         balances_salida = Balance.objects.filter(transferencia=self, movimiento='salida')
@@ -195,46 +193,75 @@ class Transferencia(models.Model):
         ordering = ['-update']
 
 
-class PagoProveedor(models.Model):
-    pais = models.ForeignKey('Pais', on_delete=models.CASCADE)
+class OpcionPago(models.Model):
+    nombre = models.CharField(max_length=13)
+
+    fecha_creacion = models.DateField(default=timezone.now, editable=False)
+    update = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.nombre
+
+    class Meta:
+        ordering = ['-update']
+
+
+class Pago(models.Model):
+    pago_proveedor = models.ForeignKey('Pais', on_delete=models.CASCADE, blank=True, null=True, verbose_name='Pago a Proveedor')
+    otros_pagos = models.ForeignKey('OpcionPago', on_delete=models.CASCADE, blank=True, null=True)
     tipo_pago = models.CharField(max_length=13, choices=OPCIONES_TIPO_PAGO_PROVEEDOR, verbose_name='Tipo de Pago')
     monto = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    observacion = models.TextField(blank=True,  null=True, verbose_name='Observación')
+    observacion = models.TextField(blank=True, null=True, verbose_name='Observación')
 
     fecha_creacion = models.DateField() #default=timezone.now, editable=False
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return str(self.pais) + ' - ' + str(self.monto)
+        return str(self.pagos) + ' - ' + str(self.monto)
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  # Guarda el objeto PagoProveedor primero
+        super().save(*args, **kwargs)  # Guarda el objeto primero
 
     # Luego busca y actualiza el objeto Balance, o crea uno nuevo si no existe
         try:
-            balance = Balance.objects.get(pago_proveedor=self)
+            balance = Balance.objects.get(pago=self)
             balance.billetera = self.tipo_pago
             balance.movimiento = 'salida'
-            balance.tipo_movimiento = 'pago proveedor'
-            balance.razon = f'{self.pais}'
+            if self.pago_proveedor is not None:
+                balance.tipo_movimiento = 'pago proveedor'
+                balance.razon = f'Pago a {self.pago_proveedor}'
+            else:
+                balance.tipo_movimiento = 'otro pago'
+                balance.razon = f'Pago {self.otros_pagos}'
             balance.monto = self.monto
             balance.fecha = self.update
             balance.save()
         except Balance.DoesNotExist:
-            Balance.objects.create(
-                pago_proveedor=self,
-                billetera=self.tipo_pago,
-                movimiento='salida',
-                tipo_movimiento='pago proveedor',
-                razon=f'{self.pais}',
-                monto=self.monto,
-                fecha=self.update
-            )
+            if self.pago_proveedor is not None:
+                Balance.objects.create(
+                    pago=self,
+                    billetera=self.tipo_pago,
+                    movimiento='salida',
+                    tipo_movimiento='pago proveedor',
+                    razon=f'{self.pais}',
+                    monto=self.monto,
+                    fecha=self.update
+                )
+            else:
+                Balance.objects.create(
+                    pago=self,
+                    billetera=self.tipo_pago,
+                    movimiento='salida',
+                    tipo_movimiento='otro pago',
+                    razon=f'Pago {self.otros_pagos}',
+                    monto=self.monto,
+                    fecha=self.update
+                )
 
     class Meta:
         ordering = ['-update']
-        verbose_name = 'Pago Proveedor'
-        verbose_name_plural = 'Pago Proveedores'
+        verbose_name = 'Pago'
+        verbose_name_plural = 'Pagos'
 
 
 class Plan(models.Model):
@@ -242,6 +269,7 @@ class Plan(models.Model):
     monto_financiado = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='Monto a Financiar')
     cantidad_cuotas = models.PositiveSmallIntegerField(verbose_name='Cantidad de Cuotas')
     monto_por_cuota = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='Monto por Cuota')
+    cuenta_corriente = 'agregar cuenta corriente aca'
 
     fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
     update = models.DateTimeField(auto_now=True)
@@ -271,7 +299,7 @@ class Cuota(models.Model):
         return str(self.plan) + ' - ' + str(self.numero_cuota)
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  # Guarda el objeto PagoProveedor primero
+        super().save(*args, **kwargs)
 
         # Luego busca y actualiza el objeto Balance, o crea uno nuevo si no existe
         if self.pagado:
@@ -280,7 +308,7 @@ class Cuota(models.Model):
                 balance.billetera = self.tipo_cuota
                 balance.movimiento = 'entrada'
                 balance.tipo_movimiento = 'cuota'
-                balance.razon = f'{self.plan} - {self.numero_cuota}'
+                balance.razon = f'Plan: {self.plan} - Cuota: {self.numero_cuota}'
                 balance.monto = self.monto
                 balance.fecha = self.update
                 balance.save()
@@ -290,10 +318,19 @@ class Cuota(models.Model):
                     billetera=self.tipo_cuota,
                     movimiento='entrada',
                     tipo_movimiento='cuota',
-                    razon=f'{self.plan} - {self.numero_cuota}',
+                    razon=f'Plan: {self.plan} - Cuota: {self.numero_cuota}',
                     monto=self.monto,
                     fecha=self.update
                 )
+                Balance.objects.create(
+                    cuota=self,
+                    billetera=self.plan.,
+                    movimiento='salida',
+                    tipo_movimiento='cuota',
+                    razon=f'Plan: {self.plan} - Cuota: {self.numero_cuota}',
+                    monto=self.monto,
+                    fecha=self.update
+                )                
 
     class Meta:
         ordering = ['numero_cuota']
@@ -302,7 +339,7 @@ class Cuota(models.Model):
 class Balance(models.Model):
     viaje = models.ForeignKey('Viaje', on_delete=models.CASCADE, blank=True, null=True)
     transferencia = models.ForeignKey('Transferencia', on_delete=models.CASCADE, blank=True, null=True)
-    pago_proveedor = models.ForeignKey('PagoProveedor', on_delete=models.CASCADE, blank=True, null=True)
+    pago = models.ForeignKey('Pago', on_delete=models.CASCADE, blank=True, null=True)
     cuota = models.ForeignKey('Cuota', on_delete=models.CASCADE, blank=True, null=True)
     
     billetera = models.CharField(max_length=20, choices=OPCIONES_DE_PAGO)

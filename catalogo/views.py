@@ -62,9 +62,12 @@ def obtener_balance(request):
 
 
 def pago_proveedor(request):
-    # Obtener la información requerida para la tabla
-    proveedores_info = Viaje.objects.values('proveedor__pais__nombre').annotate(
-        saldo=Sum('pago_proveedor_precio', default=0,),)
+    # Filter Viaje objects based on pago_cliente_estado field
+    viajes = Viaje.objects.exclude(pago_cliente_estado='cancelado')
+
+    # Sum the pago_proveedor field for the filtered objects
+    proveedores_info = viajes.values('proveedor__pais__nombre').annotate(
+        saldo=Sum('pago_proveedor', default=0))
 
     return proveedores_info
 
