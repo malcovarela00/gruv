@@ -3,6 +3,7 @@ from django.db import models
 from django.core.validators import MinValueValidator
 from .choices import (
     OPCIONES_DE_PAGO,
+    CUENTA_CORRIENTE,
     OPCIONES_DE_MODEDA,
     OPCIONES_DE_TRANSFERENCIA,
     OPCIONES_DE_TIPO_CUOTA,
@@ -60,6 +61,7 @@ class Vendedor(models.Model):
 
 class Viaje(models.Model):
     cliente = models.CharField(max_length=100)
+    dni = models.CharField(max_length=100, blank=True, null=True, verbose_name='DNI/ID')
     producto = models.CharField(max_length=200)
     localizador = models.CharField(max_length=50, unique=True)
     pax = models.PositiveSmallIntegerField(blank=True, null=True)
@@ -269,7 +271,7 @@ class Plan(models.Model):
     monto_financiado = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='Monto a Financiar')
     cantidad_cuotas = models.PositiveSmallIntegerField(verbose_name='Cantidad de Cuotas')
     monto_por_cuota = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name='Monto por Cuota')
-    cuenta_corriente = 'agregar cuenta corriente aca'
+    cuenta_corriente = models.CharField(max_length=13, choices=CUENTA_CORRIENTE)
 
     fecha_creacion = models.DateTimeField(default=timezone.now, editable=False)
     update = models.DateTimeField(auto_now=True)
@@ -303,16 +305,36 @@ class Cuota(models.Model):
 
         # Luego busca y actualiza el objeto Balance, o crea uno nuevo si no existe
         if self.pagado:
-            try:
-                balance = Balance.objects.get(cuota=self)
-                balance.billetera = self.tipo_cuota
-                balance.movimiento = 'entrada'
-                balance.tipo_movimiento = 'cuota'
-                balance.razon = f'Plan: {self.plan} - Cuota: {self.numero_cuota}'
-                balance.monto = self.monto
-                balance.fecha = self.update
-                balance.save()
-            except Balance.DoesNotExist:
+            balances_salida = Balance.objects.filter(cuota=self, movimiento='salida')
+            for balance_salida in balances_salida:
+                balance_salida.billetera = self.plan.cuenta_corriente
+                balance_salida.movimiento = 'salida'
+                balance_salida.tipo_movimiento = 'cuota'
+                balance_salida.razon = f'Plan: {self.plan} - Cuota: {self.numero_cuota}'
+                balance_salida.monto = self.monto
+                balance_salida.fecha = self.update
+                balance_salida.save()
+            if not balances_salida.exists():
+                Balance.objects.create(
+                cuota=self,
+                billetera=self.plan.cuenta_corriente,
+                movimiento='salida',
+                tipo_movimiento='cuota',
+                razon=f'Plan: {self.plan} - Cuota: {self.numero_cuota}',
+                monto=self.monto,
+                fecha=self.update
+            )
+
+            # Busca y actualiza los objetos Balance asociados con la entrada
+            balances_entrada = Balance.objects.filter(cuota=self, movimiento='entrada')
+            for balance_entrada in balances_entrada:
+                balance_entrada.billetera = self.tipo_cuota
+                balance_entrada.tipo_movimiento = 'entrada'
+                balance_entrada.razon = f'Plan: {self.plan} - Cuota: {self.numero_cuota}'
+                balance_entrada.monto = self.monto
+                balance_entrada.fecha = self.update
+                balance_entrada.save()
+            if not balances_entrada.exists():
                 Balance.objects.create(
                     cuota=self,
                     billetera=self.tipo_cuota,
@@ -322,15 +344,6 @@ class Cuota(models.Model):
                     monto=self.monto,
                     fecha=self.update
                 )
-                Balance.objects.create(
-                    cuota=self,
-                    billetera=self.plan.,
-                    movimiento='salida',
-                    tipo_movimiento='cuota',
-                    razon=f'Plan: {self.plan} - Cuota: {self.numero_cuota}',
-                    monto=self.monto,
-                    fecha=self.update
-                )                
 
     class Meta:
         ordering = ['numero_cuota']

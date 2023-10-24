@@ -54,7 +54,7 @@ class VendedorAdmin(admin.ModelAdmin):
 @admin.register(Viaje)
 class ViajeAdmin(admin.ModelAdmin):
     list_display = ('cliente', 'producto', 'localizador', 'fecha_viaje', 'pago_cliente_monto', 'vendedor')
-    fields = [('cliente', 'pax'), ('producto', 'localizador'), ('fecha_viaje', 'fecha_vuelta'), 
+    fields = [('cliente', 'dni'), ('pax', 'producto', 'localizador'), ('fecha_viaje', 'fecha_vuelta'), 
               ('vendedor', 'comision_vendedor'), ('pago_cliente_monto', 'pago_cliente_estado', 'pago_cliente_fecha_vencimiento'),
               ('proveedor', 'pago_proveedor_web', 'pago_proveedor_fecha_vencimiento', 'fecha_creacion'),
               ('pago_proveedor', 'ganancia_bruto', 'ganancia_usd_vendedor', 'ganancia_gruv', 'ganancia_neta_porc')]
@@ -93,7 +93,7 @@ class CuotaInline(admin.TabularInline):
 @admin.register(Plan)
 class PlanAdmin(admin.ModelAdmin):
     list_display = ('cliente', 'monto_financiado', 'cantidad_cuotas', 'monto_por_cuota', 'fecha_creacion')
-    fields = ['cliente', ('monto_financiado', 'cantidad_cuotas', 'monto_por_cuota')]
+    fields = [('cliente', 'cuenta_corriente'), ('monto_financiado', 'cantidad_cuotas', 'monto_por_cuota')]
     list_filter = ('fecha_creacion', 'cantidad_cuotas')
     search_fields = ('cliente',)
     inlines = [CuotaInline]

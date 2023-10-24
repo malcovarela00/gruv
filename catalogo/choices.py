@@ -10,6 +10,11 @@ OPCIONES_DE_PAGO = [
     ('cancelado', 'Cancelado'),
 ]
 
+CUENTA_CORRIENTE = [
+    ('cta-cc €', 'CTA-CC €'),
+    ('cta-cc $', 'CTA-CC $'),
+]
+
 OPCIONES_DE_TIPO_CUOTA = [
     ('wise', 'WISE'),
     ('santander', 'SANTANDER'),

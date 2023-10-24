@@ -28,7 +28,8 @@ def create_plan_and_cuotas(sender, instance, created, **kwargs):
                 cliente=instance.cliente,
                 monto_financiado=monto_financiado,
                 cantidad_cuotas=cantidad_cuotas,
-                monto_por_cuota=monto_por_cuota
+                monto_por_cuota=monto_por_cuota,
+                cuenta_corriente=instance.pago_cliente_estado
             )
             plan.save()
 
