@@ -30,17 +30,13 @@
             <tr>
                 <th>País</th>
                 <th>Saldo</th>
-                <th>Pendiente</th>
-                <th>Pago en Destino</th>
             </tr>
         </thead>
         <tbody>
             {% for proveedor_info in proveedores_info %}
             <tr>
-                <td>{{ proveedor_info.proveedor__pais__nombre }}</td>
+                <td>{{ proveedor_info.pais }}</td>
                 <td>{{ proveedor_info.saldo|floatformat:2 }}</td>
-                <td>{{ proveedor_info.pendiente|floatformat:2 }}</td>
-                <td>{{ proveedor_info.pago_en_destino|floatformat:2 }}</td>
             </tr>
             {% endfor %}
         </tbody>

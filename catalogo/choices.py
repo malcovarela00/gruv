@@ -6,9 +6,13 @@ OPCIONES_DE_PAGO = [
     ('cta-cc €', 'CTA-CC €'),
     ('cta-cc $', 'CTA-CC $'),
     ('cash', 'Cash'),
-    ('pago destino', 'Pago destino'),
     ('pendiente', 'Pendiente'),
     ('cancelado', 'Cancelado'),
+]
+
+CUENTA_CORRIENTE = [
+    ('cta-cc €', 'CTA-CC €'),
+    ('cta-cc $', 'CTA-CC $'),
 ]
 
 OPCIONES_DE_TIPO_CUOTA = [
@@ -44,7 +48,8 @@ OPCIONES_MOVIMIENTO = [
 
 TIPO_DE_MOVIMIENTO = [
     ('pago cliente', 'Pago Cliente'),
-    ('pago proveedor', 'Pago Proveedor'),
+    ('pagos', 'Pagos'),
     ('cuota', 'Cuota'),
     ('transferencia', 'Transferencia'),
+    ('otro pago', 'Otro Pago'),
 ]
