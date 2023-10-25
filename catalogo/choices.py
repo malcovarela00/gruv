@@ -48,7 +48,7 @@ OPCIONES_MOVIMIENTO = [
 
 TIPO_DE_MOVIMIENTO = [
     ('pago cliente', 'Pago Cliente'),
-    ('pago proveedor', 'Pago Proveedor'),
+    ('pagos', 'Pagos'),
     ('cuota', 'Cuota'),
     ('transferencia', 'Transferencia'),
     ('otro pago', 'Otro Pago'),

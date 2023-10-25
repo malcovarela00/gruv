@@ -35,7 +35,7 @@
         <tbody>
             {% for proveedor_info in proveedores_info %}
             <tr>
-                <td>{{ proveedor_info.proveedor__pais__nombre }}</td>
+                <td>{{ proveedor_info.pais }}</td>
                 <td>{{ proveedor_info.saldo|floatformat:2 }}</td>
             </tr>
             {% endfor %}

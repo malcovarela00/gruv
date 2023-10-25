@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Viaje, Balance, OPCIONES_DE_PAGO
+from .models import Viaje, Proveedor, Balance, Pago, OPCIONES_DE_PAGO
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views import View
 
@@ -62,12 +62,22 @@ def obtener_balance(request):
 
 
 def pago_proveedor(request):
-    # Filter Viaje objects based on pago_cliente_estado field
-    viajes = Viaje.objects.exclude(pago_cliente_estado='cancelado')
+    proveedores_info = []
 
-    # Sum the pago_proveedor field for the filtered objects
-    proveedores_info = viajes.values('proveedor__pais__nombre').annotate(
-        saldo=Sum('pago_proveedor', default=0))
+    paises = Proveedor.objects.values('pais__nombre').distinct()
+
+    for pais in paises:
+        entradas = Viaje.objects.filter(proveedor__pais__nombre=pais['pais__nombre']).exclude(
+            pago_cliente_estado='cancelado').aggregate(entrada=Sum('pago_proveedor', default=0))
+
+        salidas = Pago.objects.filter(pago_proveedor__nombre=pais['pais__nombre']).aggregate(Sum('monto'))['monto__sum'] or 0
+
+        saldo = (entradas['entrada'] or 0) - salidas
+
+        proveedores_info.append({
+            'pais': pais['pais__nombre'],
+            'saldo': saldo,
+        })
 
     return proveedores_info
 

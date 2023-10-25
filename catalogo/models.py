@@ -219,7 +219,7 @@ class Pago(models.Model):
     update = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return str(self.pagos) + ' - ' + str(self.monto)
+        return str(self.tipo_pago) + ' - ' + str(self.monto)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)  # Guarda el objeto primero
@@ -230,7 +230,7 @@ class Pago(models.Model):
             balance.billetera = self.tipo_pago
             balance.movimiento = 'salida'
             if self.pago_proveedor is not None:
-                balance.tipo_movimiento = 'pago proveedor'
+                balance.tipo_movimiento = 'pagos'
                 balance.razon = f'Pago a {self.pago_proveedor}'
             else:
                 balance.tipo_movimiento = 'otro pago'
@@ -244,8 +244,8 @@ class Pago(models.Model):
                     pago=self,
                     billetera=self.tipo_pago,
                     movimiento='salida',
-                    tipo_movimiento='pago proveedor',
-                    razon=f'{self.pais}',
+                    tipo_movimiento='pagos',
+                    razon=f'{self.pago_proveedor}',
                     monto=self.monto,
                     fecha=self.update
                 )
