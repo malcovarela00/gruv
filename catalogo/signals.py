@@ -6,14 +6,9 @@ from catalogo.models import Viaje, Plan, Cuota
 
 @receiver(post_save, sender=Viaje)
 def create_plan_and_cuotas(sender, instance, created, **kwargs):
-    is_cta_cc_payment = instance.pago_cliente_estado in ['cta-cc €', 'cta-cc usd']
+    is_cta_cc_payment = instance.pago_cliente_estado in ['cta-cc €', 'cta-cc $']
 
     if is_cta_cc_payment and created:
-        if instance.pago_cliente_moneda == 'euro':
-            tipo_cuota_plan = 'santander'
-        else:
-            tipo_cuota_plan = 'usdt'
-
         monto_financiado = instance.pago_cliente_monto
         fecha_creacion = instance.fecha_creacion
         fecha_viaje = instance.fecha_viaje
@@ -37,7 +32,7 @@ def create_plan_and_cuotas(sender, instance, created, **kwargs):
             for numero_cuota in range(cantidad_cuotas, 0, -1):
                 cuota = Cuota(
                     plan=plan,
-                    tipo_cuota=tipo_cuota_plan,
+                    tipo_cuota='pendiente',
                     monto=monto_por_cuota,
                     numero_cuota=numero_cuota,
                     saldo=round(monto_financiado - numero_cuota * monto_por_cuota, 2),
