@@ -83,16 +83,29 @@ def pago_proveedor(request):
 
 
 def vendedores_reporte(request):
-    vendedores_query = Viaje.objects.values('vendedor__nombre').annotate(
+    from django.db.models.functions import ExtractMonth
+
+    mes_seleccionado = request.GET.get('mes')
+
+    vendedores_query = Viaje.objects.annotate(
+        mes=ExtractMonth('fecha_creacion')
+    ).values('mes', 'vendedor__nombre').annotate(
         volumen_ventas=Sum('pago_cliente_monto'),
         ganancia_usd=Sum('ganancia_usd_vendedor')
-    ).order_by('-volumen_ventas')
+    )
+
+    if mes_seleccionado:
+        vendedores_query = vendedores_query.filter(mes=mes_seleccionado)
+
+    vendedores_query = vendedores_query.order_by('mes', '-volumen_ventas')
 
     vendedores = list(vendedores_query)
     for i, vendedor in enumerate(vendedores, start=1):
         vendedor['puesto'] = i
 
-    return vendedores
+    meses = Viaje.objects.dates('fecha_creacion', 'month').values_list('fecha_creacion__month', flat=True).distinct()
+
+    return render(request, 'nombre_de_tu_plantilla.html', {'vendedores': vendedores, 'meses': meses, 'mes_seleccionado': mes_seleccionado})
 
 class TablasCombinadasView(View):
     def get(self, request):
