@@ -1,25 +1,65 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Reporte de Vendedores</h2>
-    <table id='reporVendedor' class="table table-striped table-bordered">
-        <thead>
-            <tr>
-                <th>Puesto</th>
-                <th>Vendedor</th>
-                <th>Volumen de ventas</th>
-                <th>Ganancia en USD</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for vendedor in vendedores %}
-                <tr>
-                    <td>{{ vendedor.puesto }}</td>
-                    <td>{{ vendedor.vendedor__nombre }}</td>
-                    <td>{{ vendedor.volumen_ventas }}</td>
-                    <td>{{ vendedor.ganancia_usd }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <h1>Reporte de Vendedores</h1>
+
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <form method="get" class="mb-3">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="ano">Selecciona un año:</label>
+                                        <select name="ano" id="ano" class="form-control" onchange="this.form.submit()">
+                                            <option value="">Selecciona un año</option>
+                                            {% for ano in anos %}
+                                                <option value="{{ ano }}" {% if ano == ano_seleccionado %}selected{% endif %}>{{ ano }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="mes">Selecciona un mes:</label>
+                                        <select name="mes" id="mes" class="form-control" onchange="this.form.submit()">
+                                            <option value="">Selecciona un mes</option>
+                                            {% for mes in meses %}
+                                                <option value="{{ mes }}" {% if mes == mes_seleccionado %}selected{% endif %}>{{ mes }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="table-responsive">
+                            <table id="reporVendedor" class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Puesto</th>
+                                        <th>Vendedor</th>
+                                        <th>Volumen de ventas</th>
+                                        <th>Ganancia en USD</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for vendedor in vendedores %}
+                                        <tr>
+                                            <td>{{ vendedor.puesto }}</td>
+                                            <td>{{ vendedor.vendedor__nombre }}</td>
+                                            <td>{{ vendedor.volumen_ventas|floatformat:2 }}</td>
+                                            <td>{{ vendedor.ganancia_usd|floatformat:2 }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
